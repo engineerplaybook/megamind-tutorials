@@ -2,7 +2,6 @@ import React from 'react';
 
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-  return (
     <div className="min-h-screen flex flex-col font-sans">
       {/* The navbar is loaded from common-nav microfrontend */}
       {/* @ts-ignore: Custom Element */}
@@ -20,7 +19,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
       </footer>
     </div>
-  );
   );
 };
 
