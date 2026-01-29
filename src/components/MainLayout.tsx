@@ -4,6 +4,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900 font-sans">
       {/* The navbar is loaded from common-nav microfrontend */}
+      {/* @ts-ignore: Custom Element */}
       <engineering-playbook-nav></engineering-playbook-nav>
       
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
