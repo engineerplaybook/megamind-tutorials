@@ -4,12 +4,13 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
 
-type ImportMetaEnvShape = { BASE_URL?: string };
-const BASE = (import.meta as unknown as { env?: ImportMetaEnvShape }).env?.BASE_URL ?? '/tutorials/';
+// Dynamically determine basename based on current path
+const isTutorialsPath = window.location.pathname.startsWith('/tutorials');
+const basename = isTutorialsPath ? '/tutorials' : '/';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename={BASE}>
+    <BrowserRouter basename={basename}>
       <App />
     </BrowserRouter>
   </StrictMode>,
