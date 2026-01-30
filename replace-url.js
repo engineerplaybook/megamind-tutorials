@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 const distDir = path.join(__dirname, 'dist');
 const indexPath = path.join(distDir, 'index.html');
 
-const COMMON_NAV_URL = process.env.COMMON_NAV_URL || 'http://localhost:5174';
+const COMMON_NAV_URL = process.env.COMMON_NAV_URL || 'https://megamind-nav.vercel.app';
 
 try {
   if (fs.existsSync(indexPath)) {
