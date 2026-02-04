@@ -101,6 +101,30 @@ const Showcase: React.FC = () => {
       </div>
 
       <section>
+        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Latest Tutorials</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           <div className="group relative bg-gradient-to-br from-blue-700 to-indigo-800 rounded-2xl p-8 text-white overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                 <i className="fas fa-bolt text-9xl"></i>
+              </div>
+              <div className="relative z-10">
+                <span className="inline-block px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs font-bold mb-4">
+                    NEW • PERFORMANCE
+                </span>
+                <h3 className="text-2xl font-bold mb-2">Frontend Performance Guide</h3>
+                <p className="text-blue-100 mb-6">
+                    Why your app feels slow, the "React Render" myth, and how to debug Jank interactively.
+                </p>
+                <a href="/tutorials/performance" className="inline-flex items-center px-5 py-2.5 bg-white text-blue-700 rounded-lg font-bold hover:bg-blue-50 transition-colors">
+                    Start Interactive Demo
+                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                </a>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      <section>
         <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Data Table</h2>
         <DataTable data={tableData} columns={columns} />
       </section>

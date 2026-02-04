@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
+import Catalog from './pages/Catalog';
+import TutorialViewer from './pages/TutorialViewer';
 import Showcase from './pages/Showcase';
 import StateManagementPage from './pages/StateManagementPage';
 import EffectPage from './pages/EffectPage';
@@ -10,7 +12,12 @@ function App() {
   return (
     <MainLayout>
       <Routes>
-        <Route path="/" element={<Showcase />} />
+        {/* New Architecture */}
+        <Route path="/" element={<Catalog />} />
+        <Route path="/topic/:slug" element={<TutorialViewer />} />
+        
+        {/* Legacy / Direct Demos */}
+        <Route path="/showcase" element={<Showcase />} />
         <Route path="/state" element={<StateManagementPage />} />
         <Route path="/effect" element={<EffectPage />} />
         <Route path="/transition" element={<TransitionPage />} />
