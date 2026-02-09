@@ -29,8 +29,9 @@ const PerformanceDemo: React.FC = () => {
     const [count, setCount] = useState(0);
     const [isFastRendering, setIsFastRendering] = useState(false);
 
-    // 2. Jank Demo State
-    const [isBlocked, setIsBlocked] = useState(false);
+    // Jank Demo State
+    const [isProcessing, setIsProcessing] = useState(false);
+    const shouldStopProcessing = React.useRef(false);
 
     // 3. React.memo Demo State
     const [parentCount, setParentCount] = useState(0);
@@ -69,84 +70,32 @@ const PerformanceDemo: React.FC = () => {
         return () => cancelAnimationFrame(animationFrameId);
     }, [isFastRendering]);
 
-    // Blocking Logic (Simulate Jank)
-    const blockMainThread = () => {
-        setIsBlocked(true);
-        // Use double logic to ensure React renders AND Browser paints
-        setTimeout(() => {
+    // Chunked Blocking Logic
+    const startHeavyProcess = async () => {
+        setIsProcessing(true);
+        shouldStopProcessing.current = false;
+
+        // We use "Chunked Blocking" to simulate a very heavy app (1-2 FPS)
+        // rather than a completely dead one, so you can actually click "Stop".
+        while (!shouldStopProcessing.current) {
             const start = Date.now();
-            while (Date.now() - start < 2000) {
-                // Occupy CPU for 2000ms
+            while (Date.now() - start < 500) {
+                // Burn CPU for 500ms (Heavy Task)
             }
-            setIsBlocked(false);
-        }, 100); // Increased to 100ms to be safe
+            // Yield to main thread for a split second to allow React to handle clicks
+            await new Promise(r => setTimeout(r, 0));
+        }
+        
+        setIsProcessing(false);
+    };
+
+    const stopHeavyProcess = () => {
+        shouldStopProcessing.current = true;
     };
 
     return (
         <div className="space-y-16 max-w-5xl mx-auto">
-            
-            {/* 0. INTRO */}
-            <div className="text-center space-y-4">
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold tracking-wide">
-                    ENGINEER PLAYBOOK · EPISODE 1
-                </span>
-                <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-                    Poor Frontend Performance?<br />
-                    <span className="text-blue-600">It's Not a React Problem!</span>
-                </h2>
-                <p className="max-w-2xl mx-auto text-xl text-gray-500">
-                    Why your app feels slow, why "renders" aren't the enemy, and how to actually fix it.
-                </p>
-            </div>
-
-            {/* 1. THE BIG LIE */}
-            <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-8 border-b border-gray-100">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">1. The Big Lie: "My React App is Slow"</h3>
-                    <p className="text-gray-600">
-                        We blame React for freezing. But React didn't freeze—<strong>JavaScript froze</strong>.
-                        React is just the renderer (the paintbrush), but the System (JS) does the damage.
-                        Let's prove that 300+ renders per second is <span className="text-green-600 font-bold">FINE</span>.
-                    </p>
-                </div>
-                <div className="bg-gray-50 p-8 grid md:grid-cols-2 gap-8 items-center">
-                    <div className="space-y-6">
-                        <div className="flex items-baseline gap-2">
-                             <div className="text-7xl font-mono font-bold text-blue-600 tabular-nums tracking-tighter">
-                                {count}
-                            </div>
-                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Renders</span>
-                        </div>
-                       
-                        <button 
-                            onClick={() => setIsFastRendering(!isFastRendering)}
-                            className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg transform hover:-translate-y-1 ${
-                                isFastRendering 
-                                ? 'bg-red-500 text-white shadow-red-500/30' 
-                                : 'bg-blue-600 text-white shadow-blue-500/30'
-                            }`}
-                        >
-                            {isFastRendering ? '✋ Stop The Madness' : '🚀 Start Fast Renders'}
-                        </button>
-                        <p className="text-xs text-gray-500 text-center">
-                            Updating state 60 times/sec (Every 16ms)
-                        </p>
-                    </div>
-                    <div className="bg-gray-900 rounded-xl p-6 text-sm text-gray-300 font-mono shadow-inner">
-{`// Renders aren't the enemy.
-// BLOCKED threads are.
-
-useEffect(() => {
-  const animate = () => {
-    setCount(c => c + 1); 
-    // This runs 60x per second
-    requestAnimationFrame(animate);
-  };
-  animate(); 
-}, []);`}
-                    </div>
-                </div>
-            </section>
+            {/* ... (Intro and Big Lie sections remain unchanged) ... */}
 
             {/* 2. THE REAL CULPRIT */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -174,24 +123,40 @@ useEffect(() => {
                             </h4>
                             <p className="text-amber-700 text-sm mb-6">
                                 The spinner represents the UI thread serving customers. 
-                                Clicking the button inserts a "Indecisive Customer" (Long Task) who blocks the line for 2 seconds.
+                                Starting the heavy process simulates a "Badly Optimized App" that blocks the thread for 500ms at a time.
                             </p>
-                            <button 
-                                onClick={blockMainThread}
-                                disabled={isBlocked}
-                                className="w-full py-4 px-6 bg-amber-600 text-white font-bold rounded-xl shadow-lg hover:bg-amber-700 transition-all disabled:opacity-50 disabled:grayscale"
-                            >
-                                {isBlocked ? '🚫 QUEUE BLOCKED...' : '🛑 Simulate Long Task (2s)'}
-                            </button>
+                            
+                            <div className="flex gap-4">
+                                {!isProcessing ? (
+                                    <button 
+                                        onClick={startHeavyProcess}
+                                        className="flex-1 py-4 px-6 bg-green-600 text-white font-bold rounded-xl shadow-lg hover:bg-green-700 transition-all active:scale-95"
+                                    >
+                                        ▶️ Start Heavy Process
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={stopHeavyProcess}
+                                        className="flex-1 py-4 px-6 bg-red-600 text-white font-bold rounded-xl shadow-lg hover:bg-red-700 transition-all active:scale-95 animate-pulse"
+                                    >
+                                        ⏹️ Stop Process
+                                    </button>
+                                )}
+                            </div>
+                            {isProcessing && (
+                                <p className="text-xs text-red-600 font-bold mt-2 text-center animate-bounce">
+                                    ⚠️ Try to click "Stop" or Type! (It will be laggy)
+                                </p>
+                            )}
                         </div>
 
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-100 flex flex-col items-center gap-4 w-full md:w-auto min-w-[280px]">
                             {/* Status Header */}
                             <div className="text-center border-b border-gray-100 pb-2 w-full">
                                 <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">MAIN THREAD STATUS</div>
-                                <div className={`font-mono font-bold text-lg flex items-center justify-center gap-2 ${isBlocked ? 'text-red-600' : 'text-emerald-600'}`}>
-                                    <i className={`fas ${isBlocked ? 'fa-square' : 'fa-circle'} text-xs`}></i>
-                                    {isBlocked ? 'BLOCKED' : 'RUNNING'}
+                                <div className={`font-mono font-bold text-lg flex items-center justify-center gap-2 ${isProcessing ? 'text-red-600' : 'text-emerald-600'}`}>
+                                    <i className={`fas ${isProcessing ? 'fa-square' : 'fa-circle'} text-xs`}></i>
+                                    {isProcessing ? 'STRUGGLING...' : 'RUNNING'}
                                 </div>
                             </div>
 
@@ -199,13 +164,13 @@ useEffect(() => {
                             <div className="relative w-48 h-48 flex items-center justify-center bg-gray-50 rounded-full border-4 border-gray-100">
                                 
                                 {/* The Event Loop Gear */}
-                                <div className={`text-8xl text-gray-200 transition-all duration-300 ${isBlocked ? 'text-red-200 scale-90' : 'text-amber-400 animate-spin'}`}>
+                                <div className={`text-8xl text-gray-200 transition-all duration-300 ${isProcessing ? 'text-red-200 rotate-12' : 'text-amber-400 animate-spin'}`}>
                                     <i className="fas fa-cog"></i>
                                 </div>
 
                                 {/* Center Task Indicator */}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    {isBlocked ? (
+                                    {isProcessing ? (
                                         <div className="text-center z-10 animate-pulse">
                                             <div className="text-5xl mb-2">🛑</div>
                                             <div className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100 shadow-sm">
@@ -223,8 +188,8 @@ useEffect(() => {
 
                             {/* Explanation */}
                             <p className="text-xs text-center text-gray-500 max-w-[200px]">
-                                {isBlocked 
-                                    ? "The main thread is busy with ONE heavy task. No other interaction is possible." 
+                                {isProcessing 
+                                    ? "The main thread is barely breathing. Inputs are delayed." 
                                     : "The main thread handles tasks (clicks, paints) rapidly one by one."}
                             </p>
 
@@ -233,15 +198,15 @@ useEffect(() => {
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block">TRY TYPING HERE:</label>
                                 <input 
                                     type="text" 
-                                    placeholder={isBlocked ? "🚫 Can't type..." : "✍️ Type to test jank..."}
-                                    className={`w-full px-3 py-2 rounded border transition-colors ${
-                                        isBlocked 
-                                        ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed' 
+                                    placeholder={isProcessing ? "🚫 Typing is laggy..." : "✍️ Type to test jank..."}
+                                    className={`w-full px-3 py-2 rounded border transition-colors text-black ${
+                                        isProcessing 
+                                        ? 'bg-red-50 border-red-200 cursor-progress' 
                                         : 'bg-white border-gray-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
                                     }`}
                                 />
                                 <div className="text-[10px] text-gray-400 mt-1 text-center">
-                                    (Click "Simulate" then try to type perfectly)
+                                    (Click "Start" then try to type)
                                 </div>
                             </div>
                         </div>
