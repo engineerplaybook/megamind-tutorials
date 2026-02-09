@@ -79,7 +79,7 @@ const PerformanceDemo: React.FC = () => {
                 // Occupy CPU for 2000ms
             }
             setIsBlocked(false);
-        }, 5000); // Increased to 100ms to be safe
+        }, 100); // Increased to 100ms to be safe
     };
 
     return (
