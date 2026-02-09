@@ -84,8 +84,10 @@ const PerformanceDemo: React.FC = () => {
         // rather than a completely dead one, so you can actually click "Stop".
         while (!shouldStopProcessing.current) {
             const start = Date.now();
-            while (Date.now() - start < 500) {
-                // Burn CPU for 500ms (Heavy Task)
+            // Randomize blocking duration (300ms to 1000ms) to make it feel "jankier"
+            const duration = Math.random() * 700 + 300; 
+            while (Date.now() - start < duration) {
+                // Burn CPU
             }
             // Yield to main thread for a split second to allow React to handle clicks
             await new Promise(r => setTimeout(r, 0));
