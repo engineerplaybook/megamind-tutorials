@@ -1,4 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
+
+// Helper Component for React.memo demo
+const SlowComponent = ({ label }: { label: string }) => {
+    // Artificial delay to make re-renders noticeable
+    const start = Date.now();
+    while (Date.now() - start < 50) {
+        // Burn CPU for 50ms per render
+    }
+    
+    return (
+        <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 flex items-center justify-between">
+             <div>
+                <span className="font-bold text-gray-700">{label}</span>
+                <div className="text-xs text-red-500 font-mono mt-1">
+                    Rendered: {new Date().toLocaleTimeString().split(' ')[0]}
+                </div>
+            </div>
+            <span className="px-2 py-1 bg-gray-200 rounded text-xs text-gray-600">I am slow 🐌</span>
+        </div>
+    );
+};
+
+// The Optimized Version
+const MemoizedSlowComponent = memo(SlowComponent);
 
 const PerformanceDemo: React.FC = () => {
     // 1. Fast Renders Demo State
@@ -7,6 +31,29 @@ const PerformanceDemo: React.FC = () => {
 
     // 2. Jank Demo State
     const [isBlocked, setIsBlocked] = useState(false);
+
+    // 3. React.memo Demo State
+    const [parentCount, setParentCount] = useState(0);
+    const [isMemoEnabled, setIsMemoEnabled] = useState(false);
+
+    // 4. useMemo Demo State
+    const [darkMode, setDarkMode] = useState(false);
+    const [computeNumber, setComputeNumber] = useState(10);
+    const [isUseMemoEnabled, setIsUseMemoEnabled] = useState(false);
+
+    // Expensive Calculation Function
+    const expensiveCalculation = (num: number) => {
+        const start = Date.now();
+        while (Date.now() - start < 100) {
+            // Occupy CPU for 100ms
+        }
+        return num * 2;
+    };
+
+    // Calculate value: Either memoized or raw
+    const calculatedValue = isUseMemoEnabled
+        ? useMemo(() => expensiveCalculation(computeNumber), [computeNumber])
+        : expensiveCalculation(computeNumber);
 
     // Fast Render Logic (60fps updates)
     useEffect(() => {
@@ -137,19 +184,48 @@ useEffect(() => {
                             </button>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-100 flex flex-col items-center gap-4 w-full md:w-auto min-w-[200px]">
-                            <div className="relative">
-                                {/* Visual indicating frozen state */}
-                                <div className={`w-20 h-20 border-8 border-gray-200 border-t-amber-500 rounded-full ${isBlocked ? '' : 'animate-spin'}`}></div>
-                                {isBlocked && (
-                                    <div className="absolute inset-0 flex items-center justify-center text-red-500 text-2xl animate-pulse">
-                                        <i className="fas fa-ban"></i>
-                                    </div>
-                                )}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-amber-100 flex flex-col items-center gap-4 w-full md:w-auto min-w-[280px]">
+                            {/* Status Header */}
+                            <div className="text-center border-b border-gray-100 pb-2 w-full">
+                                <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">MAIN THREAD STATUS</div>
+                                <div className={`font-mono font-bold text-lg flex items-center justify-center gap-2 ${isBlocked ? 'text-red-600' : 'text-emerald-600'}`}>
+                                    <i className={`fas ${isBlocked ? 'fa-square' : 'fa-circle'} text-xs`}></i>
+                                    {isBlocked ? 'BLOCKED' : 'RUNNING'}
+                                </div>
                             </div>
-                            <div className={`text-center font-mono font-bold ${isBlocked ? 'text-red-500' : 'text-green-500'}`}>
-                                {isBlocked ? 'FROZEN (JANK)' : 'FLUID (60FPS)'}
+
+                            {/* Visualization Container */}
+                            <div className="relative w-48 h-48 flex items-center justify-center bg-gray-50 rounded-full border-4 border-gray-100">
+                                
+                                {/* The Event Loop Gear */}
+                                <div className={`text-8xl text-gray-200 transition-all duration-300 ${isBlocked ? 'text-red-200 scale-90' : 'text-amber-400 animate-spin'}`}>
+                                    <i className="fas fa-cog"></i>
+                                </div>
+
+                                {/* Center Task Indicator */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    {isBlocked ? (
+                                        <div className="text-center z-10 animate-pulse">
+                                            <div className="text-5xl mb-2">🛑</div>
+                                            <div className="text-xs font-bold text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100 shadow-sm">
+                                                HEAVY TASK
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center z-10">
+                                            <div className="text-4xl mb-1 text-amber-600">☕</div>
+                                            <div className="text-xs font-bold text-amber-600">Serving...</div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Explanation */}
+                            <p className="text-xs text-center text-gray-500 max-w-[200px]">
+                                {isBlocked 
+                                    ? "The main thread is busy with ONE heavy task. No other interaction is possible." 
+                                    : "The main thread handles tasks (clicks, paints) rapidly one by one."}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -372,6 +448,129 @@ const expensiveValue = useMemo(() => {
                         </div>
                     </div>
 
+                </div>
+            </section>
+
+            {/* 4. INTERACTIVE MEMOIZATION DEMOS */}
+            <section className="space-y-8">
+                <h3 className="text-3xl font-extrabold text-gray-900 text-center">Interactive Optimizations</h3>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                    {/* React.memo Demo */}
+                    <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                        <div className="mb-6">
+                            <h4 className="text-xl font-bold text-purple-600 mb-2 flex items-center gap-2">
+                                <i className="fas fa-cubes"></i> React.memo
+                            </h4>
+                            <p className="text-gray-600 text-sm">
+                                Prevents a child component from re-rendering if its props haven't changed.
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
+                                <div>
+                                    <div className="text-sm font-bold text-purple-900">Parent State Updates</div>
+                                    <div className="text-xs text-purple-700">Clicking button forces Parent render</div>
+                                </div>
+                                <button 
+                                    onClick={() => setParentCount(c => c + 1)}
+                                    className="px-4 py-2 bg-purple-600 text-white rounded-lg font-bold shadow hover:bg-purple-700 active:scale-95 transition-all"
+                                >
+                                    Force Render ({parentCount})
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <input 
+                                    type="checkbox" 
+                                    id="memo-toggle"
+                                    checked={isMemoEnabled}
+                                    onChange={(e) => setIsMemoEnabled(e.target.checked)}
+                                    className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+                                />
+                                <label htmlFor="memo-toggle" className="text-sm font-bold text-gray-700 select-none">
+                                    Enable <code className="bg-gray-100 px-1 rounded">React.memo</code>
+                                </label>
+                            </div>
+
+                            <div className="pt-4 border-t border-gray-100">
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">CHILD COMPONENT</p>
+                                {isMemoEnabled ? (
+                                    <MemoizedSlowComponent label="I am Memoized (Stable)" />
+                                ) : (
+                                    <SlowComponent label="I am NOT Memoized" />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* useMemo Demo */}
+                    <div className={`p-8 rounded-2xl shadow-sm border transition-colors duration-300 ${darkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="mb-6">
+                            <h4 className={`text-xl font-bold mb-2 flex items-center gap-2 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                                <i className="fas fa-brain"></i> useMemo
+                            </h4>
+                            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Caches a heavy calculation result. It only re-runs if dependencies change.
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            {/* Unrelated State Change */}
+                            <div className={`p-4 rounded-xl flex items-center justify-between ${darkMode ? 'bg-gray-800' : 'bg-blue-50'}`}>
+                                <div>
+                                    <div className={`text-sm font-bold ${darkMode ? 'text-gray-200' : 'text-blue-900'}`}>Unrelated State</div>
+                                    <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-blue-700'}`}>Toggling theme triggers render</div>
+                                </div>
+                                <button 
+                                    onClick={() => setDarkMode(!darkMode)}
+                                    className={`px-4 py-2 rounded-lg font-bold shadow transition-all ${darkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-white text-blue-600 hover:bg-blue-100'}`}
+                                >
+                                    {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                                </button>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <input 
+                                    type="checkbox" 
+                                    id="usememo-toggle"
+                                    checked={isUseMemoEnabled}
+                                    onChange={(e) => setIsUseMemoEnabled(e.target.checked)}
+                                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                                <label htmlFor="usememo-toggle" className={`text-sm font-bold select-none ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Enable <code className={`px-1 rounded ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>useMemo</code>
+                                </label>
+                            </div>
+
+                            <div className={`pt-4 border-t ${darkMode ? 'border-gray-800' : 'border-gray-100'}`}>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">EXPENSIVE CALCULATION</p>
+                                <div className={`p-4 rounded-lg flex flex-col gap-2 ${darkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Input: {computeNumber}</span>
+                                            <button 
+                                                onClick={() => setComputeNumber(c => c + 1)}
+                                                className="px-2 py-0.5 bg-gray-200 rounded text-xs hover:bg-gray-300 font-bold text-gray-700"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                        <span className="font-mono font-bold text-green-500">Result: {calculatedValue}</span>
+                                    </div>
+                                    <div className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                        (Simulated 100ms lag on calculation)
+                                    </div>
+                                    {!isUseMemoEnabled && (
+                                        <div className="text-xs text-red-500 bg-red-50 p-2 rounded border border-red-100">
+                                            ⚠️ Layout lagged because calculation ran during Theme Toggle!
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
