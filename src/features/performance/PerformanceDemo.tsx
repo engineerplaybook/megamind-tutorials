@@ -25,6 +25,11 @@ const SlowComponent = ({ label }: { label: string }) => {
 const MemoizedSlowComponent = memo(SlowComponent);
 
 const PerformanceDemo: React.FC = () => {
+    // Debug Log
+    useEffect(() => {
+        console.log("PerformanceDemo Mounted - v2 (Manual Start/Stop)");
+    }, []);
+
     // 1. Fast Renders Demo State
     const [count, setCount] = useState(0);
     const [isFastRendering, setIsFastRendering] = useState(false);
@@ -95,7 +100,68 @@ const PerformanceDemo: React.FC = () => {
 
     return (
         <div className="space-y-16 max-w-5xl mx-auto">
-            {/* ... (Intro and Big Lie sections remain unchanged) ... */}
+            {/* 0. INTRO */}
+            <div className="text-center space-y-4">
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold tracking-wide">
+                    ENGINEER PLAYBOOK · EPISODE 1
+                </span>
+                <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+                    Poor Frontend Performance?<br />
+                    <span className="text-blue-600">It's Not a React Problem!</span>
+                </h2>
+                <p className="max-w-2xl mx-auto text-xl text-gray-500">
+                    Why your app feels slow, why "renders" aren't the enemy, and how to actually fix it.
+                </p>
+            </div>
+
+            {/* 1. THE BIG LIE */}
+            <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-8 border-b border-gray-100">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">1. The Big Lie: "My React App is Slow"</h3>
+                    <p className="text-gray-600">
+                        We blame React for freezing. But React didn't freeze—<strong>JavaScript froze</strong>.
+                        React is just the renderer (the paintbrush), but the System (JS) does the damage.
+                        Let's prove that 300+ renders per second is <span className="text-green-600 font-bold">FINE</span>.
+                    </p>
+                </div>
+                <div className="bg-gray-50 p-8 grid md:grid-cols-2 gap-8 items-center">
+                    <div className="space-y-6">
+                        <div className="flex items-baseline gap-2">
+                             <div className="text-7xl font-mono font-bold text-blue-600 tabular-nums tracking-tighter">
+                                {count}
+                            </div>
+                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Renders</span>
+                        </div>
+                       
+                        <button 
+                            onClick={() => setIsFastRendering(!isFastRendering)}
+                            className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all shadow-lg transform hover:-translate-y-1 ${
+                                isFastRendering 
+                                ? 'bg-red-500 text-white shadow-red-500/30' 
+                                : 'bg-blue-600 text-white shadow-blue-500/30'
+                            }`}
+                        >
+                            {isFastRendering ? '✋ Stop The Madness' : '🚀 Start Fast Renders'}
+                        </button>
+                        <p className="text-xs text-gray-500 text-center">
+                            Updating state 60 times/sec (Every 16ms)
+                        </p>
+                    </div>
+                    <div className="bg-gray-900 rounded-xl p-6 text-sm text-gray-300 font-mono shadow-inner">
+{`// Renders aren't the enemy.
+// BLOCKED threads are.
+
+useEffect(() => {
+  const animate = () => {
+    setCount(c => c + 1); 
+    // This runs 60x per second
+    requestAnimationFrame(animate);
+  };
+  animate(); 
+}, []);`}
+                    </div>
+                </div>
+            </section>
 
             {/* 2. THE REAL CULPRIT */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
