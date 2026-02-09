@@ -4,8 +4,8 @@ import React, { useState, useEffect, useMemo, memo } from 'react';
 const SlowComponent = ({ label }: { label: string }) => {
     // Artificial delay to make re-renders noticeable
     const start = Date.now();
-    while (Date.now() - start < 50) {
-        // Burn CPU for 50ms per render
+    while (Date.now() - start < 20) {
+        // Burn CPU for 20ms per render
     }
     
     return (
@@ -227,6 +227,23 @@ useEffect(() => {
                                     ? "The main thread is busy with ONE heavy task. No other interaction is possible." 
                                     : "The main thread handles tasks (clicks, paints) rapidly one by one."}
                             </p>
+
+                            {/* New Interactive Typing Test */}
+                            <div className="w-full pt-4 border-t border-gray-100">
+                                <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1 block">TRY TYPING HERE:</label>
+                                <input 
+                                    type="text" 
+                                    placeholder={isBlocked ? "🚫 Can't type..." : "✍️ Type to test jank..."}
+                                    className={`w-full px-3 py-2 rounded border transition-colors ${
+                                        isBlocked 
+                                        ? 'bg-red-50 border-red-200 text-red-400 cursor-not-allowed' 
+                                        : 'bg-white border-gray-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                                    }`}
+                                />
+                                <div className="text-[10px] text-gray-400 mt-1 text-center">
+                                    (Click "Simulate" then try to type perfectly)
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
