@@ -72,13 +72,14 @@ const PerformanceDemo: React.FC = () => {
     // Blocking Logic (Simulate Jank)
     const blockMainThread = () => {
         setIsBlocked(true);
+        // Use double logic to ensure React renders AND Browser paints
         setTimeout(() => {
             const start = Date.now();
             while (Date.now() - start < 2000) {
                 // Occupy CPU for 2000ms
             }
             setIsBlocked(false);
-        }, 50);
+        }, 5000); // Increased to 100ms to be safe
     };
 
     return (
