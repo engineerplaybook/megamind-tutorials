@@ -223,37 +223,155 @@ useEffect(() => {
                  </div>
             </section>
 
-             {/* 4. STRATEGIES */}
+            {/* 3.5. MEMOIZATION IS A TRADEOFF */}
+            <section className="bg-indigo-50 rounded-2xl p-8 border border-indigo-100">
+                <h3 className="text-2xl font-bold text-indigo-900 mb-6 flex items-center gap-2">
+                    <i className="fas fa-brain"></i> Memoization is a Tradeoff
+                </h3>
+                <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-4">
+                        <p className="text-indigo-800">
+                            It's not free. You trade <strong>Memory</strong> for <strong>CPU</strong>.
+                            Only use it when the cost of calculation {'>'} cost of memory + overhead.
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-100">
+                                <div className="font-bold text-red-500 mb-1"><i className="fas fa-memory"></i> Memory Cost</div>
+                                <div className="text-xs text-gray-500">Storing results takes RAM. High memory usage = crashes.</div>
+                            </div>
+                            <div className="bg-white p-4 rounded-lg shadow-sm border border-indigo-100">
+                                <div className="font-bold text-orange-500 mb-1"><i className="fas fa-code"></i> Complexity</div>
+                                <div className="text-xs text-gray-500">Cache invalidation is one of the hardest problems in CS.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-gray-900 rounded-xl p-6 text-sm text-gray-300 font-mono shadow-inner overflow-x-auto">
+{`// ❌ Don't memoize cheap stuff
+const value = useMemo(() => a + b, [a, b]); 
+
+// ✅ Measure first. If slow, then memo.
+const expensiveValue = useMemo(() => {
+  return heavyComputation(data); 
+}, [data]);`}
+                    </div>
+                </div>
+            </section>
+
+             {/* 4. STRATEGIES (Expanded) */}
             <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">How to Actually Fix It</h3>
-                <div className="grid md:grid-cols-3 gap-6">
-                    <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
-                        <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4 text-lg">
-                            <i className="fas fa-trash-alt"></i>
+                
+                <div className="space-y-12">
+                    {/* Strategy 1: Delete Code */}
+                    <div className="grid md:grid-cols-[250px_1fr] gap-6">
+                        <div className="bg-purple-50 p-6 rounded-xl h-fit">
+                            <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mb-4 text-lg">
+                                <i className="fas fa-trash-alt"></i>
+                            </div>
+                            <h4 className="font-bold text-purple-900">1. Delete Code</h4>
+                            <p className="text-xs text-purple-700 mt-2">The fastest code is the code you never ship.</p>
                         </div>
-                        <h4 className="font-bold text-gray-900 mb-2">1. Delete Code</h4>
-                        <p className="text-sm text-gray-600">
-                            The fastest code is the code you never ship. Remove unused features, kill legacy scripts, and use native Browser APIs.
-                        </p>
-                    </div>
-                     <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
-                        <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 text-lg">
-                            <i className="fas fa-layer-group"></i>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                            <div className="border border-gray-100 p-4 rounded-lg hover:border-purple-200 transition-colors">
+                                <strong className="block text-gray-900 mb-1">Remove Dead Code</strong>
+                                <span className="text-sm text-gray-500">Use coverage tools. If it doesn't run, kill it.</span>
+                            </div>
+                            <div className="border border-gray-100 p-4 rounded-lg hover:border-purple-200 transition-colors">
+                                <strong className="block text-gray-900 mb-1">Lazy Load</strong>
+                                <span className="text-sm text-gray-500">Don't load the Settings page until the user clicks Settings.</span>
+                            </div>
+                            <div className="border border-gray-100 p-4 rounded-lg hover:border-purple-200 transition-colors">
+                                <strong className="block text-gray-900 mb-1">Browser APIs</strong>
+                                <span className="text-sm text-gray-500">Use `IntersectionObserver` instead of heavy scroll libraries.</span>
+                            </div>
                         </div>
-                        <h4 className="font-bold text-gray-900 mb-2">2. Reduce {'>'} Cache</h4>
-                        <p className="text-sm text-gray-600">
-                            Don't memoize heavy work—<strong>avoid the work</strong>. Virtualize lists, split components, and use Web Workers.
-                        </p>
                     </div>
-                     <div className="p-6 bg-gray-50 rounded-xl border border-gray-100">
-                        <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-4 text-lg">
-                            <i className="fas fa-network-wired"></i>
+
+                    <div className="border-t border-gray-100"></div>
+
+                    {/* Strategy 2: Reduce > Cache (Virtualization) */}
+                    <div className="grid md:grid-cols-[250px_1fr] gap-6">
+                         <div className="bg-blue-50 p-6 rounded-xl h-fit">
+                            <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-4 text-lg">
+                                <i className="fas fa-layer-group"></i>
+                            </div>
+                            <h4 className="font-bold text-blue-900">2. Reduce {'>'} Cache</h4>
+                            <p className="text-xs text-blue-700 mt-2">Don't render what you can't see.</p>
                         </div>
-                        <h4 className="font-bold text-gray-900 mb-2">3. Network Strategy</h4>
-                        <p className="text-sm text-gray-600">
-                            Avoid Waterfall requests. Cache aggressively. Load fonts/images early to improve perception.
-                        </p>
+                        <div>
+                             <h5 className="font-bold text-gray-900 mb-2">Live Demo: 10,000 Items</h5>
+                             <div className="grid grid-cols-2 gap-4 h-64">
+                                <div className="border border-red-200 bg-red-50 rounded-lg p-4 overflow-hidden relative">
+                                    <div className="absolute top-2 right-2 text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded">Normal Render</div>
+                                    <div className="h-full overflow-auto space-y-1">
+                                        {/* Fake heavy list */}
+                                        {Array.from({ length: 20 }).map((_, i) => (
+                                            <div key={i} className="h-8 bg-red-200 rounded w-full animate-pulse"></div>
+                                        ))}
+                                        <div className="text-center text-xs text-red-400 mt-2">... 9,980 more nodes ...</div>
+                                    </div>
+                                    <div className="absolute inset-0 flex items-center justify-center bg-white/50 backdrop-blur-sm">
+                                        <div className="text-center">
+                                            <div className="text-2xl mb-1">🐌</div>
+                                            <div className="text-xs font-bold text-red-800">High RAM & CPU</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="border border-green-200 bg-green-50 rounded-lg p-4 overflow-hidden relative">
+                                    <div className="absolute top-2 right-2 text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">Virtual List</div>
+                                    <div className="h-full overflow-auto space-y-1">
+                                         {Array.from({ length: 6 }).map((_, i) => (
+                                            <div key={i} className="h-8 bg-green-200 rounded w-full"></div>
+                                        ))}
+                                    </div>
+                                     <div className="absolute bottom-4 left-0 right-0 text-center">
+                                        <div className="inline-block bg-white px-3 py-1 rounded-full shadow-sm text-xs font-bold text-green-700">
+                                            Renders only 6 items
+                                        </div>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
                     </div>
+
+                    <div className="border-t border-gray-100"></div>
+
+                    {/* Strategy 3: Network */}
+                    <div className="grid md:grid-cols-[250px_1fr] gap-6">
+                        <div className="bg-green-50 p-6 rounded-xl h-fit">
+                            <div className="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mb-4 text-lg">
+                                <i className="fas fa-network-wired"></i>
+                            </div>
+                            <h4 className="font-bold text-green-900">3. Network Strategy</h4>
+                            <p className="text-xs text-green-700 mt-2">Avoid Waterfalls. Parallelize.</p>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-24 text-xs font-bold text-red-500 text-right">Waterfall</div>
+                                    <div className="flex-1 flex gap-1">
+                                        <div className="h-2 w-1/3 bg-red-400 rounded"></div>
+                                        <div className="h-2 w-1/4 bg-red-400 rounded opacity-50"></div>
+                                        <div className="h-2 w-1/3 bg-red-400 rounded opacity-25"></div>
+                                    </div>
+                                    <div className="text-xs text-gray-400">3s Total</div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-24 text-xs font-bold text-green-500 text-right">Parallel</div>
+                                    <div className="flex-1 relative h-6">
+                                         <div className="absolute top-0 left-0 h-2 w-1/3 bg-green-500 rounded"></div>
+                                         <div className="absolute top-2 left-0 h-2 w-1/4 bg-green-500 rounded opacity-70"></div>
+                                         <div className="absolute top-4 left-0 h-2 w-1/3 bg-green-500 rounded opacity-40"></div>
+                                    </div>
+                                    <div className="text-xs text-gray-400">1s Total</div>
+                                </div>
+                            </div>
+                            <p className="text-sm text-gray-500">
+                                Fetch data <strong>parallelly</strong> using `Promise.all` or Request Waterfalls (fetching data inside a component that renders after another fetch).
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
