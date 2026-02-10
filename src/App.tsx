@@ -7,6 +7,7 @@ import StateManagementPage from './pages/StateManagementPage';
 import EffectPage from './pages/EffectPage';
 import TransitionPage from './pages/TransitionPage';
 import ContextPage from './pages/ContextPage';
+import PlaygroundPage from './pages/PlaygroundPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         {/* New Architecture */}
         <Route path="/" element={<Catalog />} />
         <Route path="/topic/:slug" element={<TutorialViewer />} />
+        <Route path="/playground" element={<PlaygroundPage />} />
         
         {/* Legacy / Direct Demos */}
         <Route path="/showcase" element={<Showcase />} />
