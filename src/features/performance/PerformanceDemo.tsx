@@ -56,10 +56,11 @@ const PerformanceDemo: React.FC = () => {
         return num * 2;
     };
 
-    // Calculate value: Either memoized or raw
-    const calculatedValue = isUseMemoEnabled
-        ? useMemo(() => expensiveCalculation(computeNumber), [computeNumber])
-        : expensiveCalculation(computeNumber);
+    // Calculate value: Always use useMemo to follow Rules of Hooks
+    // If disabled, we pass a random dependency to force it to re-run every time.
+    const calculatedValue = useMemo(() => {
+        return expensiveCalculation(computeNumber);
+    }, [computeNumber, isUseMemoEnabled ? 'enabled' : Date.now()]);
 
     // Fast Render Logic (60fps updates)
     useEffect(() => {
