@@ -3,15 +3,17 @@ import TransitionDemo from '../concepts/demos/TransitionDemo';
 
 const TransitionPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-6 text-gray-900">Transitions</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Optimizing performance by marking updates as non-urgent with <code className="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-base">useTransition</code>.
+    <div className="section">
+      <div className="text-center mb-12">
+        <h1 className="hero-title">Transitions</h1>
+        <p className="hero-subtitle">
+          Optimizing performance by marking updates as non-urgent with <code className="tag bg-white">useTransition</code>.
         </p>
+      </div>
 
-        <section className="mb-8 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-          <h2 className="text-2xl font-bold mb-4 text-indigo-900">Concept Notes</h2>
+      <section className="card mb-8">
+        <div className="p-8">
+          <h2 className="text-2xl font-bold mb-4 text-primary">Concept Notes</h2>
           <div className="prose prose-indigo text-gray-700">
             <h3 className="text-lg font-semibold text-gray-900">Urgent vs. Non-Urgent Updates</h3>
             <p className="mb-4">
@@ -27,10 +29,10 @@ const TransitionPage: React.FC = () => {
               By wrapping the state update that triggers the heavy render in `startTransition`, you tell React: "You can interrupt this work if the user types again." This keeps the UI responsive (e.g., the input field doesn't freeze).
             </p>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <h2 className="text-2xl font-bold mb-6 border-b pb-2">Interactive Demo</h2>
+      <h2 className="section-title">Interactive Demo</h2>
       <TransitionDemo />
     </div>
   );

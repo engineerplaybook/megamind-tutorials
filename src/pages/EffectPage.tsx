@@ -3,15 +3,17 @@ import EffectDemo from '../concepts/demos/EffectDemo';
 
 const EffectPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-6 text-gray-900">Side Effects</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Synchronizing with external systems using <code className="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-base">useEffect</code>.
+    <div className="section">
+      <div className="text-center mb-12">
+        <h1 className="hero-title">Side Effects</h1>
+        <p className="hero-subtitle">
+          Synchronizing with external systems using <code className="tag bg-white">useEffect</code>.
         </p>
+      </div>
 
-        <section className="mb-8 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-          <h2 className="text-2xl font-bold mb-4 text-indigo-900">Concept Notes</h2>
+      <section className="card mb-8">
+        <div className="p-8">
+          <h2 className="text-2xl font-bold mb-4 text-primary">Concept Notes</h2>
           <div className="prose prose-indigo text-gray-700">
             <h3 className="text-lg font-semibold text-gray-900">The Dependency Array</h3>
             <p className="mb-4">
@@ -28,10 +30,10 @@ const EffectPage: React.FC = () => {
               If your effect returns a function, React runs it before re-running the effect (to clean up previous run) and when the component unmounts. Essential for subscriptions, timers, and event listeners.
             </p>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <h2 className="text-2xl font-bold mb-6 border-b pb-2">Interactive Demos</h2>
+      <h2 className="section-title">Interactive Demos</h2>
       <EffectDemo />
     </div>
   );

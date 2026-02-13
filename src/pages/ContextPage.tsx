@@ -3,15 +3,17 @@ import ContextDemo from '../concepts/demos/ContextDemo';
 
 const ContextPage: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-6 text-gray-900">Context API</h1>
-        <p className="text-xl text-gray-600 mb-8">
-          Sharing global data (like themes, auth user, or language) without prop drilling using <code className="bg-gray-100 px-2 py-1 rounded text-pink-600 font-mono text-base">createContext</code>.
+    <div className="section">
+      <div className="text-center mb-12">
+        <h1 className="hero-title">Context API</h1>
+        <p className="hero-subtitle">
+          Sharing global data (like themes, auth user, or language) without prop drilling using <code className="tag bg-white">createContext</code>.
         </p>
+      </div>
 
-        <section className="mb-8 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-          <h2 className="text-2xl font-bold mb-4 text-indigo-900">Concept Notes</h2>
+      <section className="card mb-8">
+        <div className="p-8">
+          <h2 className="text-2xl font-bold mb-4 text-primary">Concept Notes</h2>
           <div className="prose prose-indigo text-gray-700">
             <h3 className="text-lg font-semibold text-gray-900">Prop Drilling Problem</h3>
             <p className="mb-4">
@@ -25,10 +27,10 @@ const ContextPage: React.FC = () => {
               <li>Low-frequency updates (avoid using for high-frequency updates like mouse position).</li>
             </ul>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      <h2 className="text-2xl font-bold mb-6 border-b pb-2">Interactive Demo</h2>
+      <h2 className="section-title">Interactive Demo</h2>
       <ContextDemo />
     </div>
   );

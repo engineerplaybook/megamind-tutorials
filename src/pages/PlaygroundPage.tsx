@@ -4,45 +4,57 @@ import '@anmolthukral/performance-ui/dist/style.css';
 
 const PlaygroundPage: React.FC = () => {
     return (
-        <div style={{ minHeight: '100vh', padding: 'var(--space-6) 0' }}>
-            <div className="container vstack gap-4">
-                <div className="text-center">
-                    <h1>Performance UI Playground</h1>
-                    <p className="text-light">Reusable components from <code style={{ backgroundColor: 'var(--muted)', padding: '0.2rem 0.4rem', borderRadius: 'var(--radius-small)' }}>@anmolthukral/performance-ui</code></p>
+        <div className="section">
+            <div className="container">
+                <div className="text-center mb-16">
+                    <h1 className="hero-title">Performance UI Playground</h1>
+                    <p className="hero-subtitle">
+                        Reusable components from <code className="tag" style={{fontSize: '1em'}}>@anmolthukral/performance-ui</code>
+                    </p>
                 </div>
 
-                <div className="row">
+                <div className="grid md:grid-cols-2 gap-8">
                     {/* Jank Simulator */}
-                    <div className="col-6 vstack gap-2">
-                        <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                            <h3>Jank Simulator</h3>
+                    <div className="card">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="text-xl font-bold">Jank Simulator</h3>
                         </div>
-                        <JankSimulator />
+                        <div className="p-6">
+                            <JankSimulator />
+                        </div>
                     </div>
 
                     {/* Render Visualizer */}
-                    <div className="col-6 vstack gap-2">
-                        <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                            <h3>Render Visualizer</h3>
+                    <div className="card">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="text-xl font-bold">Render Visualizer</h3>
                         </div>
-                        <RenderVisualizer />
+                        <div className="p-6">
+                            <RenderVisualizer />
+                        </div>
                     </div>
                 </div>
 
-                {/* Virtual List */}
-                <div className="vstack gap-2">
-                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                        <h3>Virtual List Demo</h3>
+                <div className="grid gap-8 mt-8">
+                    {/* Virtual List */}
+                    <div className="card">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="text-xl font-bold">Virtual List Demo</h3>
+                        </div>
+                        <div className="p-6">
+                            <VirtualList />
+                        </div>
                     </div>
-                    <VirtualList />
-                </div>
 
-                {/* Memoization Lab */}
-                <div className="vstack gap-2">
-                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
-                        <h3>Memoization Lab</h3>
+                    {/* Memoization Lab */}
+                    <div className="card">
+                        <div className="p-6 border-b border-gray-100">
+                            <h3 className="text-xl font-bold">Memoization Lab</h3>
+                        </div>
+                        <div className="p-6">
+                            <MemoizationLab />
+                        </div>
                     </div>
-                    <MemoizationLab />
                 </div>
             </div>
         </div>
