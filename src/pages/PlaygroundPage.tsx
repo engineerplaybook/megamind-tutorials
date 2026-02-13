@@ -4,36 +4,44 @@ import '@anmolthukral/performance-ui/dist/style.css';
 
 const PlaygroundPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gray-50 p-8 pt-24">
-            <div className="max-w-7xl mx-auto space-y-12">
+        <div style={{ minHeight: '100vh', padding: 'var(--space-6) 0' }}>
+            <div className="container vstack gap-4">
                 <div className="text-center">
-                    <h1 className="text-3xl font-bold text-gray-900">Performance UI Playground</h1>
-                    <p className="text-gray-500 mt-2">Reusable components from <code className="bg-gray-200 px-1 rounded text-sm text-gray-700">@anmolthukral/performance-ui</code></p>
+                    <h1>Performance UI Playground</h1>
+                    <p className="text-light">Reusable components from <code style={{ backgroundColor: 'var(--muted)', padding: '0.2rem 0.4rem', borderRadius: 'var(--radius-small)' }}>@anmolthukral/performance-ui</code></p>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8">
+                <div className="row">
                     {/* Jank Simulator */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Jank Simulator</h2>
+                    <div className="col-6 vstack gap-2">
+                        <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                            <h3>Jank Simulator</h3>
+                        </div>
                         <JankSimulator />
                     </div>
 
                     {/* Render Visualizer */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Render Visualizer</h2>
+                    <div className="col-6 vstack gap-2">
+                        <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                            <h3>Render Visualizer</h3>
+                        </div>
                         <RenderVisualizer />
                     </div>
                 </div>
 
                 {/* Virtual List */}
-                <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Virtual List Demo</h2>
+                <div className="vstack gap-2">
+                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                        <h3>Virtual List Demo</h3>
+                    </div>
                     <VirtualList />
                 </div>
 
                 {/* Memoization Lab */}
-                <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Memoization Lab</h2>
+                <div className="vstack gap-2">
+                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+                        <h3>Memoization Lab</h3>
+                    </div>
                     <MemoizationLab />
                 </div>
             </div>
