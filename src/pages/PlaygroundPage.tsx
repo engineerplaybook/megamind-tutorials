@@ -1,6 +1,6 @@
 import React from 'react';
-import { JankSimulator, VirtualList, RenderVisualizer, MemoizationLab } from '@anmolthukral/performance-ui';
-import '@anmolthukral/performance-ui/dist/style.css';
+import { JankSimulator, VirtualList, RenderVisualizer, MemoizationLab } from '@engineerplaybook/design-system';
+import '@engineerplaybook/design-system/dist/style.css';
 
 const PlaygroundPage: React.FC = () => {
     return (
