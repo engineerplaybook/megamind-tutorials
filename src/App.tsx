@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
 import Catalog from './pages/Catalog';
 import TutorialViewer from './pages/TutorialViewer';
@@ -9,21 +9,32 @@ import TransitionPage from './pages/TransitionPage';
 import ContextPage from './pages/ContextPage';
 import PlaygroundPage from './pages/PlaygroundPage';
 
+const FeatureNotAvailable = () => (
+  <div style={{ padding: '2rem', textAlign: 'center' }}>
+    <h1>Feature Not Available</h1>
+    <p>This feature is currently disabled. Please check back later.</p>
+    <a href="/" style={{ color: 'var(--color-primary, #0070f3)', textDecoration: 'underline' }}>Go Home</a>
+  </div>
+);
+
 function App() {
+  const showTutorials = import.meta.env.VITE_FEATURE_TUTORIALS !== 'false';
+  const showPlayground = import.meta.env.VITE_FEATURE_PLAYGROUND !== 'false';
+
   return (
     <MainLayout>
       <Routes>
         {/* New Architecture */}
-        <Route path="/" element={<Catalog />} />
-        <Route path="/topic/:slug" element={<TutorialViewer />} />
-        <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/" element={showTutorials ? <Catalog /> : <FeatureNotAvailable />} />
+        <Route path="/topic/:slug" element={showTutorials ? <TutorialViewer /> : <Navigate to="/" />} />
+        <Route path="/playground" element={showTutorials && showPlayground ? <PlaygroundPage /> : <FeatureNotAvailable />} />
         
         {/* Legacy / Direct Demos */}
-        <Route path="/showcase" element={<Showcase />} />
-        <Route path="/state" element={<StateManagementPage />} />
-        <Route path="/effect" element={<EffectPage />} />
-        <Route path="/transition" element={<TransitionPage />} />
-        <Route path="/context" element={<ContextPage />} />
+        <Route path="/showcase" element={showTutorials ? <Showcase /> : <Navigate to="/" />} />
+        <Route path="/state" element={showTutorials ? <StateManagementPage /> : <Navigate to="/" />} />
+        <Route path="/effect" element={showTutorials ? <EffectPage /> : <Navigate to="/" />} />
+        <Route path="/transition" element={showTutorials ? <TransitionPage /> : <Navigate to="/" />} />
+        <Route path="/context" element={showTutorials ? <ContextPage /> : <Navigate to="/" />} />
       </Routes>
     </MainLayout>
   )
