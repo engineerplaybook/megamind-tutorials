@@ -7,7 +7,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <nav className="navbar" id="fallback-nav">
         <div className="container">
           <a href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', color: 'inherit' }}>
-            <img src="/logo.png" alt="Engineer Playbook Logo" style={{ height: '32px', width: '32px' }} />
+            <img src="/logo.svg" alt="Engineer Playbook Logo" style={{ height: '32px', width: '32px' }} />
             Engineer Playbook
           </a>
           {/* Note: Mobile toggle functionality is handled by common-nav.js, but we add the button for layout consistency */}
@@ -22,7 +22,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             {import.meta.env.VITE_FEATURE_TUTORIALS !== 'false' && (
               <a href="/tutorials" className="nav-link active">Tutorials</a>
             )}
-            <a href="/profile" className="nav-link">Profile</a>
+            <a href="/profile" className="nav-link">Team</a>
             {import.meta.env.VITE_FEATURE_TUTORIALS !== 'false' && import.meta.env.VITE_FEATURE_PLAYGROUND !== 'false' && (
               <a href="/tutorials/playground" className="nav-link">Playground</a>
             )}
