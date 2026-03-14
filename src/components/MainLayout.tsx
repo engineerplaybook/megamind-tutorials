@@ -1,52 +1,47 @@
 import React from 'react';
 
+const COMMON_NAV_ASSET_ID = 'common-nav-assets';
+const commonNavBaseUrl =
+  import.meta.env.VITE_COMMON_NAV_URL || (import.meta.env.DEV ? 'http://localhost:5174' : '/nav');
+
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  React.useEffect(() => {
+    if (document.getElementById(COMMON_NAV_ASSET_ID)) {
+      return;
+    }
+
+    const marker = document.createElement('meta');
+    marker.id = COMMON_NAV_ASSET_ID;
+
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = `${commonNavBaseUrl}/common-nav.css`;
+    stylesheet.crossOrigin = 'anonymous';
+
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = `${commonNavBaseUrl}/common-nav.js`;
+    script.crossOrigin = 'anonymous';
+
+    document.head.append(marker, stylesheet);
+    document.body.append(script);
+
+    return () => {
+      marker.remove();
+      stylesheet.remove();
+      script.remove();
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      {/* Fallback navigation - matches design-system structure */}
-      <nav className="navbar" id="fallback-nav">
-        <div className="container">
-          <a href="/" className="logo" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', color: 'inherit' }}>
-            <img src="/logo.svg" alt="Engineer Playbook Logo" style={{ height: '32px', width: '32px' }} />
-            Engineer Playbook
-          </a>
-          {/* Note: Mobile toggle functionality is handled by common-nav.js, but we add the button for layout consistency */}
-          <button className="menu-toggle" aria-label="Toggle navigation" onClick={() => {
-            const nav = document.querySelector('.nav-links');
-            nav?.classList.toggle('active');
-          }}>
-            <span style={{ fontSize: '1.5rem' }}>☰</span>
-          </button>
-          <div className="nav-links">
-            <a href="/blogs" className="nav-link">Blogs</a>
-            {import.meta.env.VITE_FEATURE_TUTORIALS !== 'false' && (
-              <a href="/tutorials" className="nav-link active">Tutorials</a>
-            )}
-            <a href="/profile" className="nav-link">Team</a>
-            {import.meta.env.VITE_FEATURE_TUTORIALS !== 'false' && import.meta.env.VITE_FEATURE_PLAYGROUND !== 'false' && (
-              <a href="/tutorials/playground" className="nav-link">Playground</a>
-            )}
-          </div>
-        </div>
-      </nav>
-
-      {/* The navbar is loaded from common-nav microfrontend */}
-      {/* @ts-ignore: Custom Element */}
+      {/* @ts-ignore custom element provided by common-nav */}
       <engineering-playbook-nav></engineering-playbook-nav>
-      
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          customElements.whenDefined('engineering-playbook-nav').then(() => {
-            const fallback = document.getElementById('fallback-nav');
-            if (fallback) fallback.style.display = 'none';
-          });
-        `
-      }} />
-      
+
       <main className="container section flex-grow mt-16">
         {children}
       </main>
-      
+
       <footer className="footer">
         <div className="container text-center">
           <p className="text-secondary text-sm">
