@@ -8,6 +8,7 @@ import EffectPage from './pages/EffectPage';
 import TransitionPage from './pages/TransitionPage';
 import ContextPage from './pages/ContextPage';
 import PlaygroundPage from './pages/PlaygroundPage';
+import NotFound from './pages/NotFound';
 
 const FeatureNotAvailable = () => (
   <div style={{ padding: '2rem', textAlign: 'center' }}>
@@ -35,6 +36,9 @@ function App() {
         <Route path="/effect" element={showTutorials ? <EffectPage /> : <Navigate to="/" />} />
         <Route path="/transition" element={showTutorials ? <TransitionPage /> : <Navigate to="/" />} />
         <Route path="/context" element={showTutorials ? <ContextPage /> : <Navigate to="/" />} />
+        
+        {/* 404 Catch-All */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </MainLayout>
   )
