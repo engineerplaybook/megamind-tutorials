@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Code, HelpCircle, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Code, HelpCircle, AlertTriangle } from 'lucide-react';
 import ContextDemo from '../concepts/demos/ContextDemo';
 
 const ContextPage: React.FC = () => {

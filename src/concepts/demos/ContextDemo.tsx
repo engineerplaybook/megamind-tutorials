@@ -120,7 +120,6 @@ const MockNavbar = () => {
 
 // --- Consumer visual feedback tracker widget ---
 const ActiveConsumers = () => {
-  const { user } = useAuth();
   const consumers = [
     { name: 'MockNavbar', desc: 'Displays global session header' },
     { name: 'LoginForm', desc: 'Handles credentials intake' },

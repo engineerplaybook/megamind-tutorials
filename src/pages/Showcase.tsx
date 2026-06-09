@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Compass, Sparkles, Image, Package, Layers, List, Table, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Compass, Sparkles, Image, Package, Layers, Table, HelpCircle } from 'lucide-react';
 import HeroBanner from '../components/ui/HeroBanner';
 import ProductCard from '../components/ui/ProductCard';
 import Carousel from '../components/ui/Carousel';
