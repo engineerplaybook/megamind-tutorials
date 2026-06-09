@@ -8,20 +8,21 @@ export interface TutorialConfig {
   blogUrl?: string; // Deep link to the blog post
   component: React.ComponentType;
   tags: string[];
+  fullscreen?: boolean; // Renders without TutorialLayout wrapper
 }
 
 // Lazy load feature components to keep initial bundle small
-const PerformanceDemo = React.lazy(() => import('../features/performance/PerformanceDemo'));
+const ClaudeCodeDemo = React.lazy(() => import('../features/claude-code/ClaudeCodeDemo'));
 
 export const tutorials: TutorialConfig[] = [
   {
-    slug: 'performance',
-    title: 'Frontend Performance Visualized',
-    description: 'Why your app feels slow, the "React Render" myth, and how to debug Jank interactively.',
-    videoId: 'dQw4w9WgXcQ', // Placeholder ID
-    blogUrl: '/blogs/frontend-performance-is-not-react',
-    component: PerformanceDemo,
-    tags: ['Performance', 'React', 'Rendering']
+    slug: 'claude-code',
+    title: 'Introduction to Claude Code',
+    description: 'An interactive tutorial on Anthropic\'s agentic coding tool — slash commands, memory files, subagents, and more.',
+    blogUrl: 'https://www.engineerplaybook.io/blogs/introduction-to-claude-code/',
+    component: ClaudeCodeDemo,
+    tags: ['Claude Code', 'AI', 'Tooling', 'Terminal'],
+    fullscreen: true
   }
 ];
 

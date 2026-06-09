@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, HelpCircle } from 'lucide-react';
 
 interface AccordionItem {
   title: string;
@@ -31,33 +31,44 @@ const Accordion: React.FC<AccordionProps> = ({ items, allowMultiple = false }) =
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-4">
+    <div className="w-full max-w-2xl mx-auto space-y-3">
       {items.map((item, index) => {
         const isOpen = openIndexes.includes(index);
         return (
           <div 
             key={index} 
-            className="border border-gray-200 rounded-lg overflow-hidden transition-shadow hover:shadow-md bg-white"
+            className={`border rounded-xl overflow-hidden transition-all duration-300 bg-white ${
+              isOpen 
+                ? 'border-primary/50 shadow-md ring-2 ring-primary/5' 
+                : 'border-borderColor/65 hover:border-primary/30 shadow-sm'
+            }`}
           >
+            {/* Header Trigger */}
             <button
-              className={`w-full px-6 py-4 text-left flex justify-between items-center transition-colors duration-200 ${
-                isOpen ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-800 hover:bg-gray-50'
-              }`}
+              className="w-full px-5 py-4 text-left flex justify-between items-center bg-white hover:bg-slate-50 transition-colors duration-200"
               onClick={() => toggleItem(index)}
+              aria-expanded={isOpen}
             >
-              <span className="font-medium text-lg">{item.title}</span>
-              {isOpen ? (
-                <ChevronUp className="w-5 h-5 transition-transform duration-300" />
-              ) : (
-                <ChevronDown className="w-5 h-5 transition-transform duration-300" />
-              )}
+              <span className={`font-heading font-extrabold text-sm md:text-base flex items-center gap-2.5 transition-colors ${
+                isOpen ? 'text-primary' : 'text-textColor-primary'
+              }`}>
+                <HelpCircle size={18} className={isOpen ? 'text-primary' : 'text-textColor-secondary/60'} />
+                {item.title}
+              </span>
+              <ChevronDown 
+                className={`w-5 h-5 text-textColor-secondary/60 transition-transform duration-350 ${
+                  isOpen ? 'transform rotate-180 text-primary' : ''
+                }`} 
+              />
             </button>
+
+            {/* Collapsible Content */}
             <div
               className={`transition-all duration-300 ease-in-out overflow-hidden ${
                 isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
               }`}
             >
-              <div className="px-6 py-4 text-gray-600 bg-white border-t border-gray-100">
+              <div className="px-5 pb-5 pt-1 text-xs md:text-sm text-textColor-secondary bg-white border-t border-dashed border-borderColor/40 leading-relaxed">
                 {item.content}
               </div>
             </div>

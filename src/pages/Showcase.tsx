@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Compass, Sparkles, Image, Package, Layers, List, Table, HelpCircle } from 'lucide-react';
 import HeroBanner from '../components/ui/HeroBanner';
 import ProductCard from '../components/ui/ProductCard';
 import Carousel from '../components/ui/Carousel';
@@ -14,15 +16,15 @@ const Showcase: React.FC = () => {
   ];
 
   const accordionItems = [
-    { title: 'What is React?', content: 'React is a JavaScript library for building user interfaces.' },
-    { title: 'Why use Tailwind CSS?', content: 'Tailwind CSS is a utility-first CSS framework for rapidly building custom user interfaces.' },
-    { title: 'What is a Hook?', content: 'Hooks are functions that let you use state and other React features without writing a class.' },
+    { title: 'What is React?', content: 'React is a component-based JavaScript library designed for rendering reactive, high-performance user interfaces.' },
+    { title: 'Why use Tailwind CSS?', content: 'Tailwind CSS is a utility-first stylesheet builder for rapidly assembling responsive layouts directly in your HTML.' },
+    { title: 'What is a React Hook?', content: 'Hooks are specialized runtime functions that let you subscribe to state, synchronizations, and concurrent transitions without writing ES6 classes.' },
   ];
 
   const tableData = [
-    { id: 1, name: 'John Doe', role: 'Developer', status: 'Active' },
-    { id: 2, name: 'Jane Smith', role: 'Designer', status: 'Active' },
-    { id: 3, name: 'Bob Johnson', role: 'Manager', status: 'Inactive' },
+    { id: 1, name: 'John Doe', role: 'Staff Developer', status: 'Active' },
+    { id: 2, name: 'Jane Smith', role: 'Lead Architect', status: 'Active' },
+    { id: 3, name: 'Bob Johnson', role: 'Operations Manager', status: 'Suspended' },
   ];
 
   const columns = [
@@ -30,8 +32,10 @@ const Showcase: React.FC = () => {
     { header: 'Name', accessor: 'name' as const },
     { header: 'Role', accessor: 'role' as const },
     { header: 'Status', accessor: (item: any) => (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-        item.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+      <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider ${
+        item.status === 'Active' 
+          ? 'bg-brand-green/10 text-brand-green border-brand-green/20' 
+          : 'bg-brand-red/10 text-brand-red border-brand-red/20'
       }`}>
         {item.status}
       </span>
@@ -39,95 +43,137 @@ const Showcase: React.FC = () => {
   ];
 
   const dropdownOptions = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
+    { value: 'option1', label: 'Database Module 01' },
+    { value: 'option2', label: 'Concurrent Module 02' },
+    { value: 'option3', label: 'Lifecycle Module 03' },
   ];
 
   return (
-    <div className="space-y-16">
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Hero Banner</h2>
-        <HeroBanner 
-          title="Welcome to React Tutorials"
-          subtitle="Master modern web development with practical examples and deep dives."
-          ctaText="Start Learning"
-          onCtaClick={() => alert('Start Learning Clicked')}
-        />
-      </section>
+    <div className="min-h-screen bg-bgdefault py-12 px-6">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* Back Link */}
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 text-sm text-textColor-secondary hover:text-primary transition-colors duration-200 mb-6 group"
+        >
+          <ArrowLeft size={16} className="transform group-hover:-translate-x-1 transition-transform" />
+          Back to Catalog
+        </Link>
 
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Product Cards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ProductCard 
-            id="1"
-            title="Premium Headphones"
-            price={299}
-            image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
-            category="Electronics"
-          />
-          <ProductCard 
-            id="2"
-            title="Ergonomic Chair"
-            price={199}
-            image="https://images.unsplash.com/photo-1592078615290-033ee584e267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
-            category="Furniture"
-          />
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Carousel</h2>
-        <Carousel images={images} />
-      </section>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Accordion</h2>
-          <Accordion items={accordionItems} />
-        </section>
-
-        <section>
-          <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Dropdown</h2>
-          <div className="h-64 border rounded-xl p-8 bg-gray-50">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Select an option</label>
-            <Dropdown 
-              label="Select Option" 
-              options={dropdownOptions} 
-              onSelect={(val) => alert(`Selected: ${val}`)} 
-            />
+        {/* Title */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-2">
+            <span className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-brand-blue">
+              <Compass size={20} />
+            </span>
+            <span className="text-xs font-bold text-textColor-secondary/60 uppercase tracking-wide">Design Showcase</span>
           </div>
-        </section>
-      </div>
-
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Latest Tutorials</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           <div className="group relative bg-gradient-to-br from-blue-700 to-indigo-800 rounded-2xl p-8 text-white overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                 <i className="fas fa-bolt text-9xl"></i>
-              </div>
-              <div className="relative z-10">
-                <span className="inline-block px-3 py-1 bg-white bg-opacity-20 rounded-full text-xs font-bold mb-4">
-                    NEW • PERFORMANCE
-                </span>
-                <h3 className="text-2xl font-bold mb-2">Frontend Performance Guide</h3>
-                <p className="text-blue-100 mb-6">
-                    Why your app feels slow, the "React Render" myth, and how to debug Jank interactively.
-                </p>
-                <a href="/tutorials/performance" className="inline-flex items-center px-5 py-2.5 bg-white text-blue-700 rounded-lg font-bold hover:bg-blue-50 transition-colors">
-                    Start Interactive Demo
-                    <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                </a>
-              </div>
-           </div>
+          <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-textColor-primary leading-tight">
+            UI Design Gallery
+          </h1>
+          <p className="text-textColor-secondary text-sm md:text-base mt-2">
+            Explore fully styled, interactive custom components engineered with Tailwind CSS utility parameters.
+          </p>
         </div>
-      </section>
 
-      <section>
-        <h2 className="text-3xl font-bold mb-6 text-gray-900 border-b pb-2">Data Table</h2>
-        <DataTable data={tableData} columns={columns} />
-      </section>
+        <div className="space-y-16">
+          
+          {/* Hero Banner Section */}
+          <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+            <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-4 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+              <Sparkles size={18} className="text-brand-blue" />
+              1. Hero Banner Component
+            </h2>
+            <HeroBanner 
+              title="Welcome to React Tutorials"
+              subtitle="Master modern web development with practical examples, visual profiling, and agentic code labs."
+              ctaText="Start Learning Now"
+              onCtaClick={() => alert('CTA Button Clicked!')}
+            />
+          </section>
+
+          {/* Product Cards Section */}
+          <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+            <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-6 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+              <Package size={18} className="text-brand-green" />
+              2. Product Showcase Cards
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <ProductCard 
+                id="1"
+                title="Premium Headphones"
+                price={299}
+                image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1770&q=80"
+                category="Electronics"
+              />
+              <ProductCard 
+                id="2"
+                title="Ergonomic Workstation Chair"
+                price={199}
+                image="https://images.unsplash.com/photo-1592078615290-033ee584e267?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                category="Furniture"
+              />
+              <ProductCard 
+                id="3"
+                title="Mechanical Keyboard"
+                price={149}
+                image="https://images.unsplash.com/photo-1587829741301-dc798b83add3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                category="Peripherals"
+              />
+            </div>
+          </section>
+
+          {/* Carousel Section */}
+          <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+            <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-4 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+              <Image size={18} className="text-brand-gold" />
+              3. Image Carousel Slider
+            </h2>
+            <Carousel images={images} />
+          </section>
+
+          {/* Accordion & Dropdown Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Accordion Column */}
+            <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+              <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-6 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+                <HelpCircle size={18} className="text-purple-500" />
+                4. Accordion Toggle List
+              </h2>
+              <Accordion items={accordionItems} />
+            </section>
+
+            {/* Dropdown Column */}
+            <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+              <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-6 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+                <Layers size={18} className="text-brand-blue" />
+                5. Selection Dropdown
+              </h2>
+              <div className="h-48 rounded-xl border border-borderColor/50 p-6 bg-slate-50/50 flex flex-col justify-center items-center">
+                <label className="block text-xs font-bold text-textColor-secondary mb-3 uppercase tracking-wider">Select a Lab Option</label>
+                <Dropdown 
+                  label="Choose Module" 
+                  options={dropdownOptions} 
+                  onSelect={(val) => alert(`Selected action: ${val}`)} 
+                />
+              </div>
+            </section>
+
+          </div>
+
+          {/* Data Table Section */}
+          <section className="bg-white rounded-2xl border border-borderColor/60 shadow-premium p-6 md:p-8">
+            <h2 className="text-lg font-heading font-extrabold text-textColor-primary mb-6 flex items-center gap-2 border-b border-borderColor/40 pb-3">
+              <Table size={18} className="text-brand-blue" />
+              6. Interactive Data Table
+            </h2>
+            <DataTable data={tableData} columns={columns} />
+          </section>
+
+        </div>
+      </div>
     </div>
   );
 };
