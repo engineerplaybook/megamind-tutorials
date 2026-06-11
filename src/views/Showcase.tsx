@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ArrowLeft, Compass, Sparkles, Image, Package, Layers, Table, HelpCircle } from 'lucide-react';
 import HeroBanner from '../components/ui/HeroBanner';
 import ProductCard from '../components/ui/ProductCard';
@@ -54,7 +54,7 @@ const Showcase: React.FC = () => {
         
         {/* Back Link */}
         <Link 
-          to="/" 
+          href="/tutorials/" 
           className="inline-flex items-center gap-2 text-sm text-textColor-secondary hover:text-primary transition-colors duration-200 mb-6 group"
         >
           <ArrowLeft size={16} className="transform group-hover:-translate-x-1 transition-transform" />

@@ -1,14 +1,15 @@
 import React, { Suspense } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams } from 'next/navigation';
 import { getTutorialBySlug } from '../data/tutorials';
 import TutorialLayout from '../layouts/TutorialLayout';
 
 const TutorialViewer: React.FC = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const params = useParams();
+    const slug = params.slug as string;
     const tutorial = slug ? getTutorialBySlug(slug) : undefined;
 
     if (!tutorial) {
-        return <Navigate to="/" replace />;
+        return null;
     }
 
     const FeatureComponent = tutorial.component;
