@@ -12,6 +12,7 @@
 
 # production
 /build
+/dist
 
 # build artifacts
 /public/common-nav.*

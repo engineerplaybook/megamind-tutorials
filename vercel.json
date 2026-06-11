@@ -1,12 +1,10 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
   "rewrites": [
     {
       "source": "/nav/:match*",
       "destination": "https://megamind-nav.vercel.app/:match*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

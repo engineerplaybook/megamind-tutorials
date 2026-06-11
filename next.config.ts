@@ -2,8 +2,6 @@ import path from 'path';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  basePath: '/tutorials',
-  assetPrefix: '/tutorials/',
   trailingSlash: true,
   reactStrictMode: true,
   turbopack: { root: path.resolve('../..') },
