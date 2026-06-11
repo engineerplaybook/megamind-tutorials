@@ -109,7 +109,7 @@ const UserFetcher = ({ onLog }: { onLog: (msg: string, type: 'mount' | 'cleanup'
 
 // --- Example 2: Event Listeners & Cleanup ---
 const WindowTracker = ({ onLog }: { onLog: (msg: string, type: 'mount' | 'cleanup' | 'effect') => void }) => {
-  const [width, setWidth] = useState(window.innerWidth);
+  const [width, setWidth] = useState(1024);
 
   useEffect(() => {
     onLog("useEffect TRIGGERED (WindowTracker MOUNT): window.addEventListener('resize')", "mount");

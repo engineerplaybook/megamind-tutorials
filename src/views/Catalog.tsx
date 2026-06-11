@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { tutorials } from '../data/tutorials';
 import { 
   Play, BookOpen, Layers, Cpu, Code, Zap, RefreshCw, Compass, ArrowRight, Sparkles 
@@ -136,7 +136,7 @@ const Catalog: React.FC = () => {
             {filteredTutorials.map((tutorial) => (
               <Link 
                 key={tutorial.slug} 
-                to={`/topic/${tutorial.slug}`}
+                href={`/tutorials/topic/${tutorial.slug}`}
                 className="group bg-white rounded-2xl border border-borderColor/60 overflow-hidden shadow-premium hover:shadow-premium-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col premium-card-gradient"
               >
                 {/* Visual Thumbnail Frame */}
@@ -214,7 +214,7 @@ const Catalog: React.FC = () => {
               return (
                 <Link 
                   key={lab.path} 
-                  to={lab.path}
+                  href={`/tutorials${lab.path}`}
                   className="group bg-white rounded-2xl border border-borderColor/60 p-6 shadow-premium hover:shadow-premium-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-4">

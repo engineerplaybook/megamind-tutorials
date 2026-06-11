@@ -1,8 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 
 const NotFound = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const [pathname, setPathname] = useState('');
+  useEffect(() => { setPathname(window.location.pathname); }, []);
 
   return (
     <div className="min-h-[75vh] flex flex-col items-center justify-center py-12 px-6 bg-bgdefault">
@@ -31,7 +34,7 @@ const NotFound = () => {
           </div>
 
           <div className="space-y-1.5 text-slate-400">
-            <p className="text-slate-500">&gt; bash route-check.sh --path {window.location.pathname}</p>
+            <p className="text-slate-500">&gt; bash route-check.sh --path {pathname}</p>
             <p className="text-brand-red">Error: HTTP_STATUS_404 (NOT_FOUND)</p>
             <p className="text-slate-500">Trace: route resolved to empty array [0 items]</p>
             <p className="text-brand-gold">Suggestion: navigate back to index catalog</p>
@@ -44,7 +47,7 @@ const NotFound = () => {
 
         {/* Back Button */}
         <button
-          onClick={() => navigate('/')}
+          onClick={() => router.push('/tutorials/')}
           className="inline-flex items-center gap-2 bg-textColor-primary hover:bg-slate-800 text-white text-xs md:text-sm font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-md active:scale-95 group"
         >
           <ArrowLeft size={16} className="transform group-hover:-translate-x-1 transition-transform" />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { ArrowLeft, Code, HelpCircle, AlertTriangle, BookOpen } from 'lucide-react';
 import ContextDemo from '../concepts/demos/ContextDemo';
 import { TheoryModal } from '../components/ui/TheoryModal';
@@ -129,7 +129,7 @@ return <UserContext.Provider value={contextValue}>{children}</UserContext.Provid
         
         {/* Back Link */}
         <Link 
-          to="/" 
+          href="/tutorials/" 
           className="inline-flex items-center gap-2 text-sm text-textColor-secondary hover:text-primary transition-colors duration-200 mb-6 group"
         >
           <ArrowLeft size={16} className="transform group-hover:-translate-x-1 transition-transform" />
