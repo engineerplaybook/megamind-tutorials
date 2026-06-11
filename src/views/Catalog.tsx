@@ -134,9 +134,9 @@ const Catalog: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredTutorials.map((tutorial) => (
-              <Link 
-                key={tutorial.slug} 
-                href={`/tutorials/topic/${tutorial.slug}`}
+              <Link
+                key={tutorial.slug}
+                href={`/topic/${tutorial.slug}`}
                 className="group bg-white rounded-2xl border border-borderColor/60 overflow-hidden shadow-premium hover:shadow-premium-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col premium-card-gradient"
               >
                 {/* Visual Thumbnail Frame */}
@@ -214,7 +214,7 @@ const Catalog: React.FC = () => {
               return (
                 <Link 
                   key={lab.path} 
-                  href={`/tutorials${lab.path}`}
+                  href={lab.path}
                   className="group bg-white rounded-2xl border border-borderColor/60 p-6 shadow-premium hover:shadow-premium-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
                 >
                   <div className="flex justify-between items-start mb-4">
