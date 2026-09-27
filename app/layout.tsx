@@ -50,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </a>
                 <a href="/tutorials/" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">Catalog</a>
                 <a href="/tutorials/playground" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">Playground</a>
+                <a href="/tutorials/topic/tipc-bot" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">AI Tutor</a>
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ export interface TutorialConfig {
 
 // Lazy load feature components to keep initial bundle small
 const ClaudeCodeDemo = React.lazy(() => import('../features/claude-code/ClaudeCodeDemo'));
+const TiPCBotDemo = React.lazy(() => import('../features/tipc-bot/TiPCBotDemo'));
 
 export const tutorials: TutorialConfig[] = [
   {
@@ -22,6 +23,14 @@ export const tutorials: TutorialConfig[] = [
     blogUrl: 'https://www.engineerplaybook.io/blogs/introduction-to-claude-code/',
     component: ClaudeCodeDemo,
     tags: ['Claude Code', 'AI', 'Tooling', 'Terminal'],
+    fullscreen: true
+  },
+  {
+    slug: 'tipc-bot',
+    title: 'TiPC Voice & Chat Bot',
+    description: 'An interactive tutorial showcasing a full-stack Next.js app with AI chat and voice capabilities.',
+    component: TiPCBotDemo,
+    tags: ['Next.js', 'AI', 'Voice', 'Chat'],
     fullscreen: true
   }
 ];
