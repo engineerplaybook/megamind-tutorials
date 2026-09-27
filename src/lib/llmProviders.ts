@@ -13,17 +13,31 @@ const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 // Rather than trusting OPENROUTER_MODEL to always be set correctly, reject any
 // override that isn't a free-tier model and fall back to the known-free
 // default — so a bad/stale env var can never silently turn into real spend.
-const OPENROUTER_FREE_DEFAULT = 'meta-llama/llama-3.1-8b-instruct:free';
+// A single hardcoded free model is fragile in practice: OpenRouter's free
+// catalog changes (models get deprecated) and individual free models get
+// rate-limited or overloaded under shared-pool load — confirmed live: the
+// original default (meta-llama/llama-3.1-8b-instruct:free) was deprecated
+// outright, and two of the next three candidates tried returned 429/503
+// within the same minute. So this tries a short list of known-:free models
+// in order and only gives up (falling through to the next provider) if all
+// of them fail.
+const OPENROUTER_FREE_MODELS = [
+  'liquid/lfm-2.5-2.6b:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'google/gemma-4-31b-it:free',
+  'qwen/qwen3.8-27b:free',
+];
 const OPENROUTER_MODEL_REQUESTED = process.env.OPENROUTER_MODEL || '';
 if (OPENROUTER_MODEL_REQUESTED && !OPENROUTER_MODEL_REQUESTED.endsWith(':free')) {
   console.warn(
     `OPENROUTER_MODEL="${OPENROUTER_MODEL_REQUESTED}" is not a free-tier model (must end with ":free") ` +
-    `— ignoring it and using "${OPENROUTER_FREE_DEFAULT}" instead to avoid unexpected billing.`
+    `— ignoring it and using the built-in free-model fallback list instead to avoid unexpected billing.`
   );
 }
-const OPENROUTER_MODEL = OPENROUTER_MODEL_REQUESTED.endsWith(':free')
-  ? OPENROUTER_MODEL_REQUESTED
-  : OPENROUTER_FREE_DEFAULT;
+const OPENROUTER_MODELS = OPENROUTER_MODEL_REQUESTED.endsWith(':free')
+  ? [OPENROUTER_MODEL_REQUESTED, ...OPENROUTER_FREE_MODELS.filter((m) => m !== OPENROUTER_MODEL_REQUESTED)]
+  : OPENROUTER_FREE_MODELS;
+const OPENROUTER_MODEL = OPENROUTER_MODELS[0];
 
 export const DEFAULT_SYSTEM_PROMPT =
   'You are a friendly TiPC learning assistant. Help the user learn about topics they ask. ' +
@@ -121,13 +135,33 @@ export async function ragAugmentMessages(messages: any[]) {
   return messages.map((m, i) => (i === lastUserIndex ? { ...m, content: augmentedContent } : m));
 }
 
+// Tries each free model in OPENROUTER_MODELS in turn, committing to the
+// first whose first chunk succeeds — mirrors the outer streamLLMResponse
+// provider-fallback pattern, nested one level down inside "openrouter" as a
+// single external candidate. Throws only if every free model fails, so the
+// outer loop correctly falls through to the next real provider.
 async function* streamOpenRouter(messages: any[]) {
   const augmented = await ragAugmentMessages(messages);
-  yield* relayOpenAICompatibleStream(
-    'https://openrouter.ai/api/v1/chat/completions',
-    { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENROUTER_API_KEY}` },
-    { model: OPENROUTER_MODEL, messages: augmented, temperature: 0.7, max_tokens: 600 }
-  );
+  const errors: string[] = [];
+  for (const model of OPENROUTER_MODELS) {
+    let gen;
+    try {
+      gen = relayOpenAICompatibleStream(
+        'https://openrouter.ai/api/v1/chat/completions',
+        { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENROUTER_API_KEY}` },
+        { model, messages: augmented, temperature: 0.7, max_tokens: 600 }
+      );
+      const first = await gen.next();
+      if (first.done) continue;
+      yield first.value;
+    } catch (err: any) {
+      errors.push(`${model}: ${err.message}`);
+      continue;
+    }
+    yield* gen;
+    return;
+  }
+  throw new Error(`All OpenRouter free models failed: ${errors.join(' | ')}`);
 }
 
 export function parseSSEBuffer(buffer: string): { events: string[], remainder: string } {
