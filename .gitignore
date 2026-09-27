@@ -32,9 +32,6 @@ lerna-debug.log*
 .env*.local
 .env
 
-# local runtime data (TiPC bot datastore)
-.tipc-data.json
-
 # vercel
 .vercel
 

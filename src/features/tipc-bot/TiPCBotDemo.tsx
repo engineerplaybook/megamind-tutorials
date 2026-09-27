@@ -8,6 +8,7 @@ import CallView from './components/CallView';
 import TextChatView from './components/TextChatView';
 import { TheoryModal } from '../../components/ui/TheoryModal';
 import { setToken, clearToken, authHeaders } from './utils/auth';
+import { API_BASE } from './utils/apiBase';
 
 const DEFAULT_SYSTEM_PROMPT =
   'You are a friendly TiPC learning assistant. Help the user learn about topics they ask. Keep answers concise, educational, and safe.';
@@ -66,7 +67,7 @@ export default function TiPCBotDemo() {
     setLoading(true);
     setAuthError('');
     try {
-      const res = await fetch('/tutorials/api/login', {
+      const res = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -76,11 +77,11 @@ export default function TiPCBotDemo() {
       setToken(data.token);
       setLogin(true);
 
-      const histRes = await fetch(`/tutorials/api/history/${username}`, { headers: authHeaders() });
+      const histRes = await fetch(`${API_BASE}/api/history/${username}`, { headers: authHeaders() });
       const histData = await histRes.json();
       setHistory(histData.history || []);
 
-      const statusRes = await fetch('/tutorials/api/llm-status');
+      const statusRes = await fetch(`${API_BASE}/api/llm-status`);
       const statusData = await statusRes.json();
       setProvider(statusData.provider || '');
     } catch {
@@ -103,7 +104,7 @@ export default function TiPCBotDemo() {
 
   const updateSystemPrompt = async () => {
     try {
-      await fetch('/tutorials/api/system-prompt', {
+      await fetch(`${API_BASE}/api/system-prompt`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ username, systemPrompt }),
@@ -116,7 +117,7 @@ export default function TiPCBotDemo() {
 
   const loadSystemPrompt = async () => {
     try {
-      const res = await fetch(`/tutorials/api/system-prompt/${username}`, { headers: authHeaders() });
+      const res = await fetch(`${API_BASE}/api/system-prompt/${username}`, { headers: authHeaders() });
       const data = await res.json();
       if (data.systemPrompt) setSystemPrompt(data.systemPrompt);
     } catch {
@@ -138,7 +139,7 @@ export default function TiPCBotDemo() {
 
   const handleNewChat = async () => {
     try {
-      await fetch(`/tutorials/api/history/${username}`, { method: 'DELETE', headers: authHeaders() });
+      await fetch(`${API_BASE}/api/history/${username}`, { method: 'DELETE', headers: authHeaders() });
     } catch {
       // server wipe is best-effort; local state still resets below
     }

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { parseSSEBuffer } from '../utils/sseParser';
 import { authHeaders } from '../utils/auth';
+import { API_BASE } from '../utils/apiBase';
 
 // POSTs to /api/chat/stream and reads the SSE body via fetch's ReadableStream
 // (not EventSource, which can't send a POST body). Calls onDelta as each
@@ -8,7 +9,7 @@ import { authHeaders } from '../utils/auth';
 // provider once the stream ends.
 export function useChatStream() {
   const streamChat = useCallback(async ({ username, message, systemPrompt }, onDelta) => {
-    const response = await fetch('/tutorials/api/chat/stream', {
+    const response = await fetch(`${API_BASE}/api/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ username, message, systemPrompt }),

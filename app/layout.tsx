@@ -34,6 +34,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-grow mt-16 transition-all duration-300 min-h-screen">
           {children}
         </main>
+
+        {/* Persistent entry point to the AI Tutor, visible from anywhere in the app */}
+        <a
+          href="/tutorials/topic/tipc-bot"
+          className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-white text-sm font-bold shadow-lg hover:bg-primary-hover hover:-translate-y-0.5 transition-all duration-200"
+        >
+          <i className="fas fa-phone text-xs"></i>
+          Start Call
+        </a>
         <footer className="bg-white border-t border-borderColor/60 py-8 mt-16 shadow-inner">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
