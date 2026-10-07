@@ -17,14 +17,14 @@ All apps are independently deployed microfrontends routed by a Vercel gateway.
 | **common-nav** | `megamind-nav` | Next.js 16 + React 19 + Vite | 5174 | Shared nav web component |
 | **profile** | `megamind-profile` | Next.js 16 + React 19 | 8080 | Team profiles |
 | **assistant** | `megamind-assistant` | Next.js 16 + React 19 | 8081 | AI assistant with multimodal streaming |
-| **engineer-model-ft** | `engineer-model-ft` | Python/ML | — | RAG ingestion pipeline + pgvector |
+| **engineer-model-ft** | `engineer-model-ft` | Python/ML | — | RAG ingestion pipeline + pgvector (Neon) |
 | **engineer-playbook-poc** | `engineer-playbook-poc` | Node.js + React (CRA) | 5001/3000 | Multimodal backend + POC client |
 
 ---
 
-## Multimodal Streaming Architecture
+## Multimodal Streaming Architecture (Client-Side TTS)
 
-### End-to-End Flow
+### End-to-End Flow (Current)
 
 ```
 User Query (tutorials/assistant/POC client)
@@ -35,30 +35,29 @@ User Query (tutorials/assistant/POC client)
 │  engineer-playbook-poc/server/index.js                      │
 └─────────────────────────────────────────────────────────────┘
         │
-        ├──────────────────┬──────────────────┬─────────────────┐
-        ▼                  ▼                  ▼                 ▼
-   ┌───────────┐     ┌─────────────┐   ┌───────────┐    ┌───────────┐
-   │   LLM     │────▶│   Writer    │   │   RAG     │    │   TTS     │
-   │ Provider  │     │   Agent     │   │ (pgvector)│    │  Queue    │
-   │ (OpenRouter)    │ (liquid)    │   │ + Chunks  │    │ (Piper/   │
-   └───────────┘     └─────────────┘   └───────────┘    │ ElevenLabs)│
-        │                  │                         └───────────┘
-        │                  │                                 │
-        ▼                  ▼                                 ▼
-   SSE: llm           SSE: writer                       SSE: audio
-   (raw tokens)       (curated markdown)                (base64 PCM)
-        │                  │                                 │
-        └──────────────────┴─────────────────────────────────┘
-                                     │
-                                     ▼
-                              ┌──────────────────┐
-                              │  Frontend Apps   │
-                              │  (all consumers) │
-                              │ - Markdown       │
-                              │   Renderer       │
-                              │ - Audio Queue    │
-                              │ - Voice Selector │
-                              └──────────────────┘
+        ├──────────────────┬──────────────────┐
+        ▼                  ▼                  ▼
+   ┌───────────┐     ┌─────────────┐   ┌───────────┐
+   │   LLM     │────▶│   Writer    │   │   RAG     │
+   │ Provider  │     │   Agent     │   │ (pgvector)│
+   │ (OpenRouter)    │ (liquid)    │   │ + Chunks  │
+   └───────────┘     └─────────────┘   └───────────┘
+        │                  │
+        ▼                  ▼
+   SSE: llm           SSE: writer
+   (raw tokens)       (curated markdown)
+        │                  │
+        └──────────────────┴─────────────────────────┐
+                                                     ▼
+                                              ┌──────────────────┐
+                                              │  Client Browser  │
+                                              │  - Markdown      │
+                                              │    Renderer      │
+                                              │  - SpeechSynth   │
+                                              │    (TTS Queue)   │
+                                              │  - SpeechRecog   │
+                                              │    (Voice Input) │
+                                              └──────────────────┘
 ```
 
 ### API Contract: `/api/chat/stream-multimodal`
@@ -72,18 +71,18 @@ Authorization: Bearer <jwt>
 {
   "username": "user-name",
   "message": "How do React hooks work?",
-  "voiceProvider": "elevenlabs",  // "elevenlabs" | "openai" | "local"
   "systemPrompt": "optional custom system prompt"
 }
 ```
 
-**Response:** Server-Sent Events (SSE) with three event types:
+**Response:** Server-Sent Events (SSE) with **two** event types:
 
 | Event | Type | Payload | Description |
 |-------|------|---------|-------------|
 | `llm` | string | `{ delta: "token", provider: "openrouter:..." }` | Raw LLM token stream |
 | `writer` | string | `{ delta: "markdown chunk" }` | Curated markdown from Writer Agent |
-| `audio` | string | `{ chunk: "base64pcm", format: "pcm16", provider: "elevenlabs" }` | TTS audio chunk |
+
+> **Note**: `audio` event removed — TTS now happens client-side via Web Speech API.
 
 ---
 
@@ -93,11 +92,10 @@ Authorization: Bearer <jwt>
 
 | File | Purpose |
 |------|---------|
-| `index.js:496-594` | SSE endpoint `/api/chat/stream-multimodal` |
+| `index.js:496-594` | SSE endpoint `/api/chat/stream-multimodal` (llm + writer only) |
 | `llmProviders.js` | LLM providers (OpenRouter, Groq, Gemini, Runpod, Ollama) + RAG |
-| `ttsProviders.js:23-185` | TTS providers: Piper (local) + ElevenLabs streaming |
-| `ttsProviders.js:188-293` | Writer Agent: curates raw LLM → structured markdown |
-| `ttsQueue.js` | Concurrency-controlled TTS request queue |
+| `ttsProviders.js:188-293` | **Writer Agent only**: curates raw LLM → structured markdown |
+| `ttsQueue.js` | **DEPRECATED** — remove (was for server TTS) |
 
 ### RAG Pipeline (`engineer-model-ft/rag/`)
 
@@ -109,7 +107,7 @@ Authorization: Bearer <jwt>
 | `db.py` | pgvector operations: init, insert, search (cosine similarity), stats |
 | `query.py` | Test query script |
 
-**Database Schema (pgvector):**
+**Database Schema (pgvector on Neon):**
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -128,13 +126,18 @@ CREATE TABLE chunks (
 CREATE INDEX chunks_embedding_hnsw ON chunks USING hnsw (embedding vector_cosine_ops);
 ```
 
+**Current Data (Neon):**
+- 26,274 total chunks (~238 MB)
+- Sources: `content` (15), `mdn` (22,004), `nextjs` (1,470), `react.dev` (1,883), `ts-handbook` (902)
+
 ### Frontend Shared
 
 | Component | Location | Purpose |
 |-----------|----------|---------|
-| `useMultimodalStream` hook | `tutorials/src/features/tipc-bot/hooks/useMultimodalStream.ts` | Consumes 3 SSE streams, manages audio queue |
+| `useMultimodalStream` hook | `tutorials/src/features/tipc-bot/hooks/useMultimodalStream.ts` | Consumes `llm`/`writer` SSE, **manages client TTS queue** |
 | `MarkdownRenderer` | `tutorials/src/features/tipc-bot/components/MarkdownRenderer.tsx` | GFM + Shiki + Callouts + Tables |
-| `MultimodalChatView` | `tutorials/src/features/tipc-bot/components/MultimodalChatView.tsx` | Chat UI with voice selector |
+| `MultimodalChatView` | `tutorials/src/features/tipc-bot/components/MultimodalChatView.tsx` | Chat UI with voice selector (→ `VoiceCallView` pending) |
+| `useSpeechRecognition` | `tutorials/src/features/tipc-bot/hooks/useSpeechRecognition.ts` | Voice input (works in TextChatView) |
 
 ---
 
@@ -143,10 +146,10 @@ CREATE INDEX chunks_embedding_hnsw ON chunks USING hnsw (embedding vector_cosine
 ### 1. RAG Ingestion (One-time / CI)
 ```bash
 # Source content: tutorials/app, tutorials/src, blogs/content
-# Embeddings: Ollama nomic-embed-text (768-dim) or OpenAI text-embedding-3-small
-# Target: Supabase/Neon PostgreSQL + pgvector
+# Embeddings: Ollama nomic-embed-text (768-dim)
+# Target: Neon PostgreSQL + pgvector
 cd engineer-model-ft/rag
-export RAG_DATABASE_URL="postgresql://..."
+export RAG_DATABASE_URL="postgresql://neondb_owner:npg_ZSR0V5muNDbP@ep-fancy-shape-b34wucma.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 python3 -m ingest
 ```
 
@@ -156,24 +159,37 @@ User Question
       │
       ▼
 ┌──────────────────────────────────────┐
-│ 1. Embed question (Ollama/OpenAI)    │
-│ 2. Vector search (cosine similarity) │
-│    SELECT ... ORDER BY embedding <=> │
-│    $1::vector LIMIT 5                │
+│ 1. Full-text search (Neon)           │
+│    to_tsvector @@ plainto_tsquery    │
 └──────────────────────────────────────┘
       │
       ▼
 ┌──────────────────────────────────────┐
-│ 3. Build augmented prompt with       │
+│ 2. Build augmented prompt with       │
 │    retrieved chunks as context       │
 └──────────────────────────────────────┘
       │
       ▼
 ┌──────────────────────────────────────┐
-│ 4. Stream LLM (OpenRouter liquid)    │
+│ 3. Stream LLM (OpenRouter liquid)    │
 │    → Writer Agent (same model,       │
 │      different prompt)               │
-│    → TTS Queue (parallel)            │
+└──────────────────────────────────────┘
+      │
+      ▼
+┌──────────────────────────────────────┐
+│ 4. Client receives SSE:              │
+│    - llm: raw tokens (debug view)    │
+│    - writer: curated markdown chunks │
+└──────────────────────────────────────┘
+      │
+      ▼
+┌──────────────────────────────────────┐
+│ 5. Client TTS (Web Speech API):      │
+│    - Queue writer deltas as          │
+│      SpeechSynthesisUtterance        │
+│    - Play sequentially (teaching     │
+│      voice: paced, clear)            │
 └──────────────────────────────────────┘
 ```
 
@@ -196,56 +212,52 @@ Instructs model to produce:
 | Syntax highlighting | `shiki` (TypeScript, Python, Rust, Go, JSON, etc.) |
 | Callouts | Custom components (Note, Warning, Example, Key) |
 | Tables | Responsive horizontal scroll |
-| Audio | Web Audio API (base64 PCM → AudioBuffer) |
+| **TTS (NEW)** | **Web Speech API** (`SpeechSynthesisUtterance`) |
+| Voice Input | Web Speech API (`SpeechRecognition`) |
 
 ---
 
 ## Deployment
 
-### Vercel (6 Frontend Apps)
+### Vercel (5 Frontend Apps)
 Each app deployed independently:
 - Build Command: `npm run build:vercel` (installs with `--legacy-peer-deps`)
 - Install Command: `npm install --legacy-peer-deps`
 - No root workspace — each app self-contained
 
-### Backend (POC Server)
-- Deploy to Render/Fly.io/Railway
-- Environment variables: `RAG_DATABASE_URL`, `OPENROUTER_API_KEY`, `ELEVENLABS_API_KEY`, etc.
+### Backend (POC Server on Render)
+- Environment variables (see AGENTS.md for values)
 - Runs on port 5001
+- **No Piper binary needed** — TTS moved to client
 
-### Database
-- **Dev**: Local PostgreSQL + pgvector
-- **Prod**: Supabase (PostgreSQL + pgvector) or Neon
+### Database (Neon)
+- PostgreSQL + pgvector (extension enabled)
 - Connection: `RAG_DATABASE_URL` in `.env`
+- **Full-text search** currently (pgvector cosine similarity pending `pgvector` extension)
 
 ---
 
 ## Environment Variables
 
-### Shared (All Apps)
+### Frontend Apps (Vercel)
 ```bash
-# Frontend apps
-NEXT_PUBLIC_API_URL=http://localhost:5001  # or production backend URL
+NEXT_PUBLIC_API_URL=https://engineer-playbook-poc.onrender.com
 ```
 
-### Backend (`engineer-playbook-poc/server/.env`)
+### Backend (`engineer-playbook-poc/server/.env` on Render)
 ```bash
 PORT=5001
-AUTH_EMAIL=admin@domain.com
-AUTH_PASSWORD=secure-password
-JWT_SECRET=64-char-hex
-OPENROUTER_API_KEY=sk-or-...
-ELEVENLABS_API_KEY=sk_...
-RAG_DATABASE_URL=postgresql://user:pass@host:5432/db
-OLLAMA_BASE_URL=http://localhost:11434  # optional local dev
-OLLAMA_TONE_MODEL=engineering-tone
-OLLAMA_EMBED_MODEL=nomic-embed-text
+AUTH_EMAIL=test@email.com
+AUTH_PASSWORD=Tester@123
+JWT_SECRET=42a6099dd784910413751a7566603e12d4b15ca9cd6256fea47544110283e950
+OPENROUTER_API_KEY=sk-or-... (set in Render dashboard)
+RAG_DATABASE_URL=postgresql://neondb_owner:npg_ZSR0V5muNDbP@ep-fancy-shape-b34wucma.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+ENABLE_PIPER_TTS=false
 ```
 
 ### RAG Ingestion (`engineer-model-ft/rag/.env`)
 ```bash
-RAG_DATABASE_URL=postgresql://user:pass@host:5432/db
-OPENAI_API_KEY=sk-...  # optional, for OpenAI embeddings
+RAG_DATABASE_URL=postgresql://neondb_owner:npg_ZSR0V5muNDbP@ep-fancy-shape-b34wucma.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 ```
 
 ---
@@ -256,7 +268,6 @@ OPENAI_API_KEY=sk-...  # optional, for OpenAI embeddings
 - JWT auth on backend endpoints
 - Guardrails on user input (blocked patterns)
 - OpenRouter free-model guardrail (rejects non-`:free` models)
-- Rate limiting via TTS queue concurrency control
 
 ---
 
@@ -266,27 +277,43 @@ OPENAI_API_KEY=sk-...  # optional, for OpenAI embeddings
 # 1. Start all frontends
 cd megamind && npm run dev
 
-# 2. Start backend
+# 2. Start backend (local)
 cd engineer-playbook-poc/server && npm run dev
 
 # 3. (Optional) Start Ollama for local LLM + embeddings
 ollama serve
 ollama pull nomic-embed-text
-ollama pull liquid/lfm-2.5-2.6b:free  # or use OpenRouter
 
-# 4. Ingest content (one-time)
-cd engineer-model-ft/rag
-export RAG_DATABASE_URL="postgresql://..."
-python3 -m ingest
+# 4. RAG already ingested to Neon (no local DB needed)
+#    For fresh ingest:
+# cd engineer-model-ft/rag
+# export RAG_DATABASE_URL="postgresql://neondb_owner:...@ep-fancy-shape-...neon.tech/neondb?sslmode=require&channel_binding=require"
+# python3 -m ingest
 
 # 5. Test
-# tutorials → http://localhost:5173 (TiPC Bot tab)
+# tutorials → http://localhost:5173 (TiPC Bot tab → Multimodal)
 # assistant → http://localhost:8081
-# blogs → http://localhost:3000
-# nav → http://localhost:5174
-# profile → http://localhost:8080
-# POC → http://localhost:3000
+# blogs     → http://localhost:3000
+# nav       → http://localhost:5174
+# profile   → http://localhost:8080
+# POC       → http://localhost:3000
 ```
+
+---
+
+## Next Implementation: Voice Call Teaching UX
+
+### Target Experience
+1. **Single "Start Call" button** → mic activates, teacher begins speaking
+2. **Content renders as teacher explains** — flowchart appears, then code, then explanation
+3. **Web Speech API queue** — `writer` deltas → `SpeechSynthesisUtterance` → sequential playback
+4. **Paced teaching voice** — rate ~0.9, pauses at headings/code blocks
+5. **Visual sync** — scroll to element as it's being read
+
+### Files to Modify
+- `tutorials/src/features/tipc-bot/hooks/useMultimodalStream.ts` — add `speakWriterDelta(delta)` queue
+- `tutorials/src/features/tipc-bot/components/MultimodalChatView.tsx` — add `VoiceCallView` mode
+- `tutorials/src/features/tipc-bot/components/VoiceCallView.tsx` — new component (full-screen, mic always on)
 
 ---
 
