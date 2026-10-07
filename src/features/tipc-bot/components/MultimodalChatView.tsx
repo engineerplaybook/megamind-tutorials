@@ -1,9 +1,27 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Volume2, Bot, Sparkles, Copy, Mic, MicOff, Settings, ChevronDown, AlertTriangle } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { Volume2, Bot, Sparkles, Copy, Mic, MicOff, Settings, ChevronDown, AlertTriangle, Info, BookOpen, Key } from 'lucide-react';
 import { useMultimodalStream, useLocalTTS } from '../hooks/useMultimodalStream';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { createHighlighterCore } from 'shiki/core';
+import { createJavaScriptRegexEngine } from 'shiki/engine/javascript';
+import themeGitHubDark from 'shiki/themes/github-dark.mjs';
+import themeGitHubLight from 'shiki/themes/github-light.mjs';
+import langTypeScript from 'shiki/langs/typescript.mjs';
+import langJavaScript from 'shiki/langs/javascript.mjs';
+import langPython from 'shiki/langs/python.mjs';
+import langRust from 'shiki/langs/rust.mjs';
+import langGo from 'shiki/langs/go.mjs';
+import langJson from 'shiki/langs/json.mjs';
+import langHtml from 'shiki/langs/html.mjs';
+import langCss from 'shiki/langs/css.mjs';
+import langBash from 'shiki/langs/bash.mjs';
+import langYaml from 'shiki/langs/yaml.mjs';
+import langMarkdown from 'shiki/langs/markdown.mjs';
+import langDockerfile from 'shiki/langs/dockerfile.mjs';
 
 interface ChatTurn {
   role: string;
@@ -439,26 +457,150 @@ function MessageBubble({
   );
 }
 
-// Simple markdown renderer
+// Proper markdown renderer with GFM, Shiki syntax highlighting, and callouts
 function MarkdownRenderer({ content }: { content: string }) {
-  return <div dangerouslySetInnerHTML={{ __html: simpleMarkdown(content) }} />;
-}
+  const [highlighter, setHighlighter] = useState<Awaited<ReturnType<typeof createHighlighterCore>> | null>(null);
+  
+  useEffect(() => {
+    createHighlighterCore({
+      themes: [themeGitHubDark, themeGitHubLight],
+      langs: [
+        langTypeScript, langJavaScript, langPython, langRust, langGo,
+        langJson, langHtml, langCss, langBash, langYaml, langMarkdown,
+        langDockerfile,
+      ],
+      engine: createJavaScriptRegexEngine(),
+    }).then(setHighlighter);
+  }, []);
+  
+  const components = useMemo(() => ({
+    pre: ({ children, className, ...props }: React.HTMLAttributes<HTMLPreElement>) => {
+      const language = className?.replace('language-', '') || 'text';
+      const code = typeof children === 'string' ? children : '';
+      
+      if (!highlighter) {
+        return (
+          <pre className="bg-slate-900 p-3 rounded-lg overflow-x-auto my-2" {...props}>
+            <code className={`language-${language}`}>{code}</code>
+          </pre>
+        );
+      }
+      
+      const html = highlighter.codeToHtml(code, {
+        lang: language,
+        themes: { light: 'github-light', dark: 'github-dark' },
+      });
+      
+      return <div dangerouslySetInnerHTML={{ __html: html }} className="my-2" />;
+    },
+    code: ({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) => {
+      if (className?.startsWith('language-')) return <code {...props} className={className}>{children}</code>;
+      return <code className="px-1.5 py-0.5 bg-bgdefault/60 rounded text-sm font-mono" {...props}>{children}</code>;
+    },
+    blockquote: ({ children, ...props }: React.HTMLAttributes<HTMLQuoteElement>) => {
+      const content = React.Children.toArray(children);
+      const firstChild = content[0];
+      const text = typeof firstChild === 'string' ? firstChild : '';
+      
+      if (text.startsWith('💡') || text.startsWith('**💡') || text.includes('**💡 Note')) {
+        return (
+          <div className="border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 p-3 my-3 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="prose prose-sm max-w-none dark:prose-invert text-amber-800 dark:text-amber-200">{children}</div>
+            </div>
+          </div>
+        );
+      }
+      if (text.startsWith('⚠️') || text.startsWith('**⚠️') || text.includes('**⚠️ Warning')) {
+        return (
+          <div className="border-l-4 border-orange-500 bg-orange-50 dark:bg-orange-900/20 p-3 my-3 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+              <div className="prose prose-sm max-w-none dark:prose-invert text-orange-800 dark:text-orange-200">{children}</div>
+            </div>
+          </div>
+        );
+      }
+      if (text.startsWith('📝') || text.startsWith('**📝') || text.includes('**📝 Example')) {
+        return (
+          <div className="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-3 my-3 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <BookOpen className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="prose prose-sm max-w-none dark:prose-invert text-blue-800 dark:text-blue-200">{children}</div>
+            </div>
+          </div>
+        );
+      }
+      if (text.startsWith('🔑') || text.startsWith('**🔑') || text.includes('**🔑 Key Term')) {
+        return (
+          <div className="border-l-4 border-purple-500 bg-purple-50 dark:bg-purple-900/20 p-3 my-3 rounded-r-lg">
+            <div className="flex items-start gap-2">
+              <Key className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
+              <div className="prose prose-sm max-w-none dark:prose-invert text-purple-800 dark:text-purple-200">{children}</div>
+            </div>
+          </div>
+        );
+      }
+      return <blockquote className="border-l-4 border-borderColor/60 pl-4 italic text-textColor-secondary my-3" {...props}>{children}</blockquote>;
+    },
+    table: ({ children, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+      <div className="overflow-x-auto my-3">
+        <table className="min-w-full divide-y divide-borderColor/60" {...props}>
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children, ...props }: React.ThHTMLAttributes<HTMLTableCellElement>) => (
+      <th className="px-3 py-2 bg-bgdefault/60 text-left text-xs font-bold text-textColor-secondary uppercase tracking-wider" {...props}>
+        {children}
+      </th>
+    ),
+    td: ({ children, ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => (
+      <td className="px-3 py-2 text-sm border-t border-borderColor/60" {...props}>
+        {children}
+      </td>
+    ),
+    h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h1 className="text-2xl font-bold mt-4 mb-2" {...props}>{children}</h1>
+    ),
+    h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h2 className="text-xl font-bold mt-4 mb-2" {...props}>{children}</h2>
+    ),
+    h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h3 className="text-lg font-bold mt-3 mb-1" {...props}>{children}</h3>
+    ),
+    ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+      <ul className="list-disc pl-5 space-y-1 my-2" {...props}>{children}</ul>
+    ),
+    ol: ({ children, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
+      <ol className="list-decimal pl-5 space-y-1 my-2" {...props}>{children}</ol>
+    ),
+    li: ({ children, ...props }: React.LiHTMLAttributes<HTMLLIElement>) => (
+      <li className="ml-2" {...props}>{children}</li>
+    ),
+    p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+      <p className="my-2" {...props}>{children}</p>
+    ),
+    a: ({ children, href, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+      <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" {...props}>
+        {children}
+      </a>
+    ),
+    strong: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <strong className="font-bold" {...props}>{children}</strong>
+    ),
+    em: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <em className="italic" {...props}>{children}</em>
+    ),
+  }), [highlighter]);
 
-function simpleMarkdown(text: string): string {
-  return text
-    .replace(/^### (.*$)/gim, '<h3 class="text-lg font-bold mt-3 mb-1">$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-4 mb-2">$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code class="px-1.5 py-0.5 bg-bgdefault/60 rounded text-sm font-mono">$1</code>')
-    .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre class="bg-slate-900 p-3 rounded-lg overflow-x-auto my-2"><code class="language-$1">$2</code></pre>')
-    .replace(/^- (.*$)/gim, '<li class="ml-4">$1</li>')
-    .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul class="list-disc pl-5 space-y-1 my-2">$1</ul>')
-    .replace(/\n/g, '<br/>')
-    // Special markers
-    .replace(/💡/g, '<span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium">💡</span>')
-    .replace(/⚠️/g, '<span class="inline-flex items-center gap-1 text-orange-600 dark:text-orange-400 font-medium">⚠️</span>')
-    .replace(/📝/g, '<span class="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 font-medium">📝</span>')
-    .replace(/🔑/g, '<span class="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 font-medium">🔑</span>');
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={components}
+    >
+      {content}
+    </ReactMarkdown>
+  );
 }
