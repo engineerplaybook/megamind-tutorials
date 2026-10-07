@@ -58,7 +58,7 @@ export default function TiPCBotDemo() {
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
   const [history, setHistory] = useState<ChatTurn[]>([]);
   const [provider, setProvider] = useState('');
-  const [view, setView] = useState<ChatView>('call');
+  const [view, setView] = useState<ChatView>('multimodal');
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [guardrailNote, setGuardrailNote] = useState('');
