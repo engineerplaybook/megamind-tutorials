@@ -129,7 +129,7 @@ export function useMultimodalStream(): UseMultimodalStreamReturn {
   }, [audioPlayerLoop]);
 
   const streamMultimodal = useCallback(async (
-    { username, message, systemPrompt, voiceProvider = 'elevenlabs' }: MultimodalParams,
+    { username, message, systemPrompt, voiceProvider = 'piper' }: MultimodalParams,
     callbacks: MultimodalCallbacks = {}
   ) => {
     const { onLLMDelta, onWriterDelta, onAudioChunk, onDone, onError } = callbacks;
