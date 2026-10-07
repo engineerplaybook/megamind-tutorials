@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:vercel": "npm install --legacy-peer-deps && next build",
+    "build:vercel": "next build",
     "start": "next start",
     "lint": "eslint \"app/**/*.{ts,tsx}\" \"src/**/*.{ts,tsx}\""
   },
