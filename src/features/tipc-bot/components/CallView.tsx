@@ -88,9 +88,9 @@ export default function CallView({ username, systemPrompt, history, onHistoryUpd
 
   useEffect(() => {
     if (state.status === CALL_STATES.LISTENING && !state.muted) {
-      recognition.start();
+      recognition.startListening();
     } else {
-      recognition.stop();
+      recognition.stopListening();
     }
   }, [state.status, state.muted, recognition]);
 
@@ -100,7 +100,7 @@ export default function CallView({ username, systemPrompt, history, onHistoryUpd
   };
 
   const hangUp = () => {
-    recognition.stop();
+    recognition.stopListening();
     tts.stop();
     setLiveUserText('');
     setLiveAssistantText('');

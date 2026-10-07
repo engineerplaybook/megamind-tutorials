@@ -60,12 +60,13 @@ type CartAction =
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
-    case 'ADD_ITEM':
+    case 'ADD_ITEM': {
       return {
         items: [...state.items, action.payload],
         total: state.total + action.payload.price,
       };
-    case 'REMOVE_ITEM':
+    }
+    case 'REMOVE_ITEM': {
       const itemToRemoveIndex = state.items.findIndex(item => item.id === action.payload);
       if (itemToRemoveIndex === -1) return state;
       const newItems = [...state.items];
@@ -74,8 +75,10 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
         items: newItems,
         total: state.total - removedItem.price,
       };
-    case 'CLEAR_CART':
+    }
+    case 'CLEAR_CART': {
       return { items: [], total: 0 };
+    }
     default:
       return state;
   }

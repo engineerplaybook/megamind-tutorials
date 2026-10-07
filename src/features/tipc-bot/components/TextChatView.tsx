@@ -107,19 +107,19 @@ export default function TextChatView({ username, systemPrompt, history, onHistor
           <span className="text-[11px] text-red-700">
             Voice input not supported in this browser. Use Chrome + HTTPS or localhost.
           </span>
-        ) : recognition.isListening ? (
+) : recognition.isListening ? (
           <button
-            onClick={recognition.stop}
+            onClick={recognition.stopListening}
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red hover:brightness-110 text-white text-xs font-bold rounded-xl shadow-sm transition active:scale-95"
           >
             <Square size={12} fill="currentColor" />
-            Stop &amp; Send
+            Stop & Send
           </button>
         ) : (
           <button
             onClick={() => {
               tts.prime();
-              recognition.start();
+              recognition.startListening();
             }}
             disabled={isLoading}
             className="inline-flex items-center gap-2 px-4 py-2 bg-textColor-primary hover:bg-slate-800 text-white text-xs font-bold rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50"

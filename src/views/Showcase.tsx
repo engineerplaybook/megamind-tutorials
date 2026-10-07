@@ -27,11 +27,13 @@ const Showcase: React.FC = () => {
     { id: 3, name: 'Bob Johnson', role: 'Operations Manager', status: 'Suspended' },
   ];
 
+  type TableDataItem = typeof tableData[0];
+
   const columns = [
     { header: 'ID', accessor: 'id' as const },
     { header: 'Name', accessor: 'name' as const },
     { header: 'Role', accessor: 'role' as const },
-    { header: 'Status', accessor: (item: any) => (
+    { header: 'Status', accessor: (item: TableDataItem) => (
       <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border uppercase tracking-wider ${
         item.status === 'Active' 
           ? 'bg-brand-green/10 text-brand-green border-brand-green/20' 

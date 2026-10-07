@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export function useSpeechRecognition({ onInterim, onFinal } = {}) {
   const [isListening, setIsListening] = useState(false);
   const [supported, setSupported] = useState(true);
+  const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef(null);
   const onInterimRef = useRef(onInterim);
   const onFinalRef = useRef(onFinal);
@@ -27,6 +28,7 @@ export function useSpeechRecognition({ onInterim, onFinal } = {}) {
     recognition.onresult = (event) => {
       const result = event.results[event.results.length - 1];
       const transcript = result[0].transcript;
+      setTranscript(transcript);
       if (result.isFinal) {
         if (onFinalRef.current) onFinalRef.current(transcript);
       } else if (onInterimRef.current) {
@@ -53,7 +55,7 @@ export function useSpeechRecognition({ onInterim, onFinal } = {}) {
     };
   }, []);
 
-  const start = useCallback(() => {
+  const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
     try {
       setIsListening(true);
@@ -63,7 +65,7 @@ export function useSpeechRecognition({ onInterim, onFinal } = {}) {
     }
   }, []);
 
-  const stop = useCallback(() => {
+  const stopListening = useCallback(() => {
     if (recognitionRef.current) {
       try {
         recognitionRef.current.stop();
@@ -74,5 +76,5 @@ export function useSpeechRecognition({ onInterim, onFinal } = {}) {
     setIsListening(false);
   }, []);
 
-  return { start, stop, isListening, supported };
+  return { startListening, stopListening, isListening, supported, transcript };
 }

@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+'use client';
+
+import { useRouter, usePathname } from 'next/navigation';
 import { ArrowLeft, ShieldAlert } from 'lucide-react';
 
 const NotFound = () => {
   const router = useRouter();
-  const [pathname, setPathname] = useState('');
-  useEffect(() => { setPathname(window.location.pathname); }, []);
+  const pathname = usePathname();
 
   return (
     <div className="min-h-[75vh] flex flex-col items-center justify-center py-12 px-6 bg-bgdefault">

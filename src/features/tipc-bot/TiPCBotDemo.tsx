@@ -3,9 +3,11 @@ import Link from 'next/link';
 import {
   ArrowLeft, Bot, Phone, Keyboard, ShieldCheck, BookOpen,
   LogOut, UserRound, KeyRound, Sparkles, Cpu, MessageSquarePlus,
+  Mic,
 } from 'lucide-react';
 import CallView from './components/CallView';
 import TextChatView from './components/TextChatView';
+import { MultimodalChatView } from './components/MultimodalChatView';
 import { TheoryModal } from '../../components/ui/TheoryModal';
 import { setToken, clearToken, authHeaders } from './utils/auth';
 import { API_BASE } from './utils/apiBase';
@@ -18,7 +20,7 @@ interface ChatTurn {
   content: string;
 }
 
-type ChatView = 'call' | 'text';
+type ChatView = 'call' | 'text' | 'multimodal';
 
 const guardrailsTheory = (
   <div className="space-y-4">
@@ -127,7 +129,10 @@ export default function TiPCBotDemo() {
 
   useEffect(() => {
     if (username && login) {
-      loadSystemPrompt();
+      const load = async () => {
+        await loadSystemPrompt();
+      };
+      load();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username, login]);
@@ -296,6 +301,16 @@ export default function TiPCBotDemo() {
                   >
                     <Keyboard size={13} /> Text
                   </button>
+                  <button
+                    onClick={() => setView('multimodal')}
+                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                      view === 'multimodal'
+                        ? 'bg-white text-primary shadow-sm border border-borderColor/60'
+                        : 'text-textColor-secondary hover:text-primary'
+                    }`}
+                  >
+                    <Mic size={13} /> Multimodal
+                  </button>
                 </div>
                 <button
                   onClick={handleNewChat}
@@ -365,13 +380,21 @@ export default function TiPCBotDemo() {
                     onHistoryUpdate={handleHistoryUpdate}
                     onSwitchToText={() => setView('text')}
                   />
-                ) : (
+                ) : view === 'text' ? (
                   <TextChatView
                     username={username}
                     systemPrompt={systemPrompt}
                     history={history}
                     onHistoryUpdate={handleHistoryUpdate}
                     onSwitchToCall={() => setView('call')}
+                  />
+                ) : (
+                  <MultimodalChatView
+                    username={username}
+                    systemPrompt={systemPrompt}
+                    history={history}
+                    onHistoryUpdate={handleHistoryUpdate}
+                    onSwitchToText={() => setView('text')}
                   />
                 )}
               </div>

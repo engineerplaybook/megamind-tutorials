@@ -9,19 +9,26 @@ interface LogEntry {
   time: string;
 }
 
+interface UserData {
+  id: number;
+  name: string;
+  role: string;
+  email: string;
+}
+
 // --- Example 1: Data Fetching ---
 const UserFetcher = ({ onLog }: { onLog: (msg: string, type: 'mount' | 'cleanup' | 'effect') => void }) => {
   const [userId, setUserId] = useState(1);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let ignore = false;
-    setLoading(true);
     onLog(`useEffect TRIGGERED: Fetching data for User ID ${userId}`, 'effect');
     
     // Simulate API call
     const fetchData = async () => {
+      setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 800));
       
       if (!ignore) {
