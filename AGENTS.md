@@ -218,9 +218,9 @@ npm run dev
 cd engineer-playbook-poc/server && npm run dev
 
 # 5. RAG already ingested to Neon (no local DB needed)
-#    For fresh ingest:
+#    For fresh ingest (set RAG_DATABASE_URL in your env):
 # cd engineer-model-ft/rag
-# export RAG_DATABASE_URL="postgresql://neondb_owner:npg_ZSR0V5muNDbP@ep-fancy-shape-b34wucma.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+# export RAG_DATABASE_URL="postgresql://<user>:<pass>@<host>/<db>?sslmode=require"
 # python3 -m ingest
 
 # 6. Verify
@@ -245,7 +245,7 @@ AUTH_EMAIL=test@email.com
 AUTH_PASSWORD=Tester@123
 JWT_SECRET=42a6099dd784910413751a7566603e12d4b15ca9cd6256fea47544110283e950
 OPENROUTER_API_KEY=sk-or-... (set in Render dashboard)
-RAG_DATABASE_URL=postgresql://neondb_owner:npg_ZSR0V5muNDbP@ep-fancy-shape-b34wucma.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+RAG_DATABASE_URL=postgresql://<user>:<pass>@<host>/<db>?sslmode=require (set in Render dashboard)
 ENABLE_PIPER_TTS=false
 ```
 
