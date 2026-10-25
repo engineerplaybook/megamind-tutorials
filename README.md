@@ -28,28 +28,41 @@ npm run lint
 
 | Path | Description |
 |------|-------------|
-| `/` | Landing page |
-| `/topic/[slug]` | Tutorial content pages |
-| `/state` | useState deep dive |
-| `/effect` | useEffect deep dive |
-| `/context` | useContext patterns |
-| `/transition` | useTransition patterns |
-| `/playground` | Interactive code playground |
-| `/showcase` | Component showcase |
-| `/topic/tipc-bot` | TiPC Voice & Chat Bot — full-stack AI tutor (see below) |
+| `/` | Course catalog |
+| `/topic/claude-code` | Introduction to Claude Code course |
+| `/topic/react` | React, From First Principles course |
 
-## TiPC Voice & Chat Bot
+Every course is a full-screen three-pane player: collapsible course contents on
+the left, lesson content and interactive labs in the middle, and a Live Tutor on
+the right.
 
-Frontend-only in this app (`src/features/tipc-bot/`) — streaming AI chat +
-hands-free voice calls with server-side guardrails. It talks directly to the
-`engineer-playbook-poc` Express backend deployed on Render
-(`NEXT_PUBLIC_API_URL`, defaults to `https://engineer-playbook-poc.onrender.com`;
-see `.env.example`), the same backend `engineer-playbook-poc/client` uses.
-There's no local API route or datastore here — login, chat, RAG, and the
-OpenRouter free-model fallback chain all live in that backend's repo.
+## Live Tutor
 
-`username` in the UI is just a free-text conversation label, not an account —
-the backend has a single shared login (email/password), not per-user accounts.
+The tutor panel streams answers from `/api/chat/stream` on the
+`engineer-playbook-poc` backend and speaks them with the browser's Web Speech API.
+It is course-aware: the current module is included in the system prompt.
+
+- **Chat:** markdown answers streamed token by token.
+- **Call:** hands-free voice loop (speech recognition → stream → speech synthesis).
+- **Auth:** the backend uses one shared login. Set `NEXT_PUBLIC_TUTOR_EMAIL` and
+  `NEXT_PUBLIC_TUTOR_PASSWORD` for silent sign-in, or use the inline form.
+  These are public client env vars, so only use the shared demo account.
+- **History:** each browser gets its own conversation id per course. The reset
+  button clears both the local chat and the backend history for that id.
+
+## Development
+
+```bash
+npm install
+npm run dev     # http://localhost:5173
+```
+
+## Build
+
+```bash
+npm run build
+npm run lint
+```
 
 ## Deployment
 
