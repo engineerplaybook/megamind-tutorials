@@ -3,7 +3,6 @@ import { metadata } from './metadata';
 import '@engineerplaybook/design-system/dist/style.css';
 import './globals.css';
 
-// eslint-disable-next-line react-refresh/only-export-components -- Next.js requires metadata export alongside default component
 export { metadata };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -31,14 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
 
-        {/* Persistent entry point to the AI Tutor, visible from anywhere in the app */}
-        <a
-          href="/tutorials/topic/tipc-bot"
-          className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-white text-sm font-bold shadow-lg hover:bg-primary-hover hover:-translate-y-0.5 transition-all duration-200"
-        >
-          <i className="fas fa-phone text-xs"></i>
-          Start Call
-        </a>
         <footer className="bg-white border-t border-borderColor/60 py-8 mt-16 shadow-inner">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -54,8 +45,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <i className="fab fa-linkedin-in text-lg"></i>
                 </a>
                 <a href="/tutorials/" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">Catalog</a>
-                <a href="/tutorials/playground" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">Playground</a>
-                <a href="/tutorials/topic/tipc-bot" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">AI Tutor</a>
+                <a href="/tutorials/topic/claude-code" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">Claude Code</a>
+                <a href="/tutorials/topic/react" className="text-sm font-semibold text-textColor-secondary hover:text-primary transition-colors duration-200">React</a>
               </div>
             </div>
           </div>
